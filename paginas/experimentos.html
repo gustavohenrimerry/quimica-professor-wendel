@@ -184,7 +184,11 @@ Utilize equipamentos de proteção quando necessário e nunca misture produtos d
     async function inicializarBancoExperimentos() {
         try {
             let { data, error } = await supabaseClient.from('experimentos').select('*');
-            if (error || !data || data.length === 0) {
+            if (error) {
+                console.error("Erro ao verificar dados:", error.message);
+                return;
+            }
+            if (!data || data.length === 0) {
                 for (let exp of experimentosPadrao) {
                     await supabaseClient.from('experimentos').insert([exp]);
                 }
@@ -425,7 +429,10 @@ Utilize equipamentos de proteção quando necessário e nunca misture produtos d
         if (novosLikes < 0) novosLikes = 0;
 
         if (!isNaN(idExp)) {
-            await supabaseClient.from('experimentos').update({ likes: novosLikes }).eq('id', idExp);
+            const { error } = await supabaseClient.from('experimentos').update({ likes: novosLikes }).eq('id', idExp);
+            if (error) {
+                console.error("Erro ao atualizar likes:", error.message);
+            }
         }
 
         span.innerText = novosLikes;
@@ -581,7 +588,7 @@ Utilize equipamentos de proteção quando necessário e nunca misture produtos d
             btnExcluir.style.border = "none";
             btnExcluir.style.padding = "3px 6px";
             btnExcluir.style.borderRadius = "3px";
-            btnExcluir.style.cursor.pointer = "pointer";
+            btnExcluir.style.cursor = "pointer";
             btnExcluir.style.fontSize = "11px";
             btnExcluir.title = "Apagar comentário (Modo Professor)";
             btnExcluir.onclick = function() {

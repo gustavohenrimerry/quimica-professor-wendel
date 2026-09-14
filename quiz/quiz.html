@@ -640,21 +640,31 @@ async function salvarSerieNoSupabase(serie) {
 
     if (data && data.length > 0) {
 
-        await window.meuClienteSupabase
+        const { error } = await window.meuClienteSupabase
             .from("perguntas")
             .update({
                 dados: listaAtual
             })
             .eq("serie", serie);
 
+        if (error) {
+            console.error("Erro ao atualizar perguntas:", error.message);
+            alert("Erro ao salvar perguntas: " + error.message);
+        }
+
     } else {
 
-        await window.meuClienteSupabase
+        const { error } = await window.meuClienteSupabase
             .from("perguntas")
             .insert({
                 serie: serie,
                 dados: listaAtual
             });
+
+        if (error) {
+            console.error("Erro ao inserir perguntas:", error.message);
+            alert("Erro ao salvar perguntas: " + error.message);
+        }
 
     }
 

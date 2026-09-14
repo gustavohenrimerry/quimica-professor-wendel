@@ -167,10 +167,6 @@ Revise os conteúdos e teste seus conhecimentos com níveis variados.
 </footer>
 
 <script>
-    const SUPABASE_URL = 'https://ahstdxgglfgjfeuurkqg.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhaHN0ZHhnbGZnamZldXVya3FnIi';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     const perguntasIniciais = [
         // Fácil
         { nivel: 'facil', pergunta: 'O que é Química?', resposta: 'Química é a ciência que estuda a matéria, suas propriedades e transformações.' },
@@ -238,7 +234,11 @@ Revise os conteúdos e teste seus conhecimentos com níveis variados.
     async function inicializarBancoPerguntas() {
         try {
             let { data, error } = await supabaseClient.from('perguntas_quimica').select('*');
-            if (error || !data || data.length === 0) {
+            if (error) {
+                console.error("Erro ao verificar dados:", error.message);
+                return;
+            }
+            if (!data || data.length === 0) {
                 for (let p of perguntasIniciais) {
                     await supabaseClient.from('perguntas_quimica').insert([p]);
                 }
@@ -258,7 +258,7 @@ Revise os conteúdos e teste seus conhecimentos com níveis variados.
             let senha = prompt("Senha de acesso:");
             if (!senha) return;
 
-            let { data, error } = await supabaseClient.auth.signInWithPassword({ email, senha });
+            let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
             if (error) {
                 alert("Erro ao entrar: " + error.message);
                 return;

@@ -144,9 +144,8 @@
 </footer>
 
 <script>
-    const SUPABASE_URL = 'https://ahstdxgglfgjfeuurkqg.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhaHN0ZHhnbGZnamZldXVya3FnIi';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Usa o cliente global já inicializado em supabaseClient.js
+    const supabaseClient = window.meuClienteSupabase;
 
     const cardsIniciais = [
         {
@@ -187,7 +186,11 @@
 
     async function inicializarBancoCards() {
         let { data, error } = await supabaseClient.from('cards_professor').select('*');
-        if (error || !data || data.length === 0) {
+        if (error) {
+            console.error("Erro ao verificar cards do professor:", error.message);
+            return;
+        }
+        if (!data || data.length === 0) {
             for (let c of cardsIniciais) {
                 await supabaseClient.from('cards_professor').insert([{
                     id: c.id,
@@ -200,12 +203,17 @@
         }
     }
 
-    function verificarSeProfessor() {
-        return sessionStorage.getItem('professor_autenticado') === 'true';
+    async function verificarSeProfessor() {
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            return !!session;
+        } catch (e) {
+            return false;
+        }
     }
 
-    function verificarEstadoProfessorInicial() {
-        if (verificarSeProfessor()) {
+    async function verificarEstadoProfessorInicial() {
+        if (await verificarSeProfessor()) {
             document.getElementById('painelAdmin').style.display = 'block';
             document.getElementById('btnAuth').innerText = '🔓 Sair do Painel do Professor';
             document.getElementById('btnAuth').style.background = '#dc3545';
@@ -213,19 +221,18 @@
     }
 
     async function alternarAuth() {
-        if (!verificarSeProfessor()) {
+        if (!(await verificarSeProfessor())) {
             let email = prompt("E-mail de acesso do professor:");
             if (!email) return;
             let senha = prompt("Senha de acesso:");
             if (!senha) return;
 
-            let { data, error } = await supabaseClient.auth.signInWithPassword({ email, senha });
+            let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
             if (error) {
                 alert("Erro ao entrar: " + error.message);
                 return;
             }
 
-            sessionStorage.setItem('professor_autenticado', 'true');
             document.getElementById('painelAdmin').style.display = 'block';
             document.getElementById('btnAuth').innerText = '🔓 Sair do Painel do Professor';
             document.getElementById('btnAuth').style.background = '#dc3545';
@@ -233,7 +240,6 @@
             alert("Painel desbloqueado com sucesso!");
         } else {
             await supabaseClient.auth.signOut();
-            sessionStorage.removeItem('professor_autenticado');
             document.getElementById('painelAdmin').style.display = 'none';
             document.getElementById('btnAuth').innerText = '🔐 Entrar no Painel do Professor';
             document.getElementById('btnAuth').style.background = '#28a745';
@@ -254,7 +260,7 @@
         const container = document.getElementById('containerCards');
         const cards = await obterCards();
         container.innerHTML = '';
-        let logado = verificarSeProfessor();
+        let logado = await verificarSeProfessor();
 
         cards.forEach(card => {
             const divCard = document.createElement('div');
@@ -290,7 +296,7 @@
 
     async function adicionarCard(event) {
         event.preventDefault();
-        if (!verificarSeProfessor()) return;
+        if (!(await verificarSeProfessor())) return;
 
         const titulo = document.getElementById('novoTitulo').value;
         let texto = document.getElementById('novoTexto').value;
@@ -317,7 +323,7 @@
     }
 
     async function excluirCard(id) {
-        if (!verificarSeProfessor()) return;
+        if (!(await verificarSeProfessor())) return;
 
         if (confirm('Tem certeza que deseja excluir este card completamente?')) {
             let { error } = await supabaseClient.from('cards_professor').delete().eq('id', id);
@@ -331,7 +337,7 @@
     }
 
     async function editarCard(id) {
-        if (!verificarSeProfessor()) return;
+        if (!(await verificarSeProfessor())) return;
 
         let { data } = await supabaseClient.from('cards_professor').select('*').eq('id', id);
         let card = data ? data[0] : null;

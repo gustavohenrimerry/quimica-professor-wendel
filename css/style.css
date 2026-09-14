@@ -307,3 +307,172 @@ footer {
     flex-shrink: 0;
     margin-top: auto;
 }
+
+#barra-admin {
+    background: #1b3b2b;
+    padding: 12px; 
+    text-align: center; 
+    border-bottom: 2px solid #a3e4d7; 
+    font-family: Arial, sans-serif; 
+    position: sticky; 
+    top: 0; 
+    z-index: 1000; 
+}
+
+#barra-admin input {
+     padding: 6px; 
+     border-radius: 4px; 
+     border: none; 
+     outline: none; 
+     margin-right: 5px; 
+}
+
+#barra-admin button { 
+    padding: 6px 12px; 
+    border-radius: 4px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    border: none; 
+}
+
+.modal-admin { 
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.8); 
+    z-index: 2000; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.modal-content-admin { 
+    background: #1e2621; 
+    padding: 30px; 
+    border-radius: 12px; 
+    width: 90%; 
+    max-width: 500px; 
+    color: white; 
+    border: 1px solid #a3e4d7; 
+    text-align: left; 
+}
+
+.modal-content-admin input, .modal-content-admin textarea { 
+    width: 100%; 
+    padding: 10px; 
+    margin-top: 5px; 
+    margin-bottom: 15px; 
+    border-radius: 6px; 
+    border: 1px solid #555; 
+    background: #2a352f; 
+    color: white; 
+    box-sizing: border-box; 
+}
+
+.acoes-artigo { 
+    display: none !important; 
+}
+
+article.modo-admin { 
+    position: relative; 
+    border: 2px dashed #00b4d8; 
+    padding-bottom: 15px; 
+}
+
+article.modo-admin .acoes-artigo { 
+    display: flex !important; 
+    margin-top: 10px; gap: 8px; 
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    header {
+        padding: 15px 20px;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    nav {
+        margin-top: 10px;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    nav a {
+        margin-left: 0;
+        padding: 5px 8px;
+        font-size: 14px;
+    }
+
+    .banner {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .banner h1 {
+        font-size: 30px;
+        text-align: center;
+    }
+
+    .banner p {
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .emojis-laterais, .molecula-lateral {
+        width: 300px;
+        height: 300px;
+        min-width: 300px;
+        min-height: 300px;
+    }
+
+    .series {
+        padding: 15px 10px;
+    }
+
+    .series a {
+        flex: 1 1 42%;
+        max-width: none;
+        padding: 12px 10px;
+        font-size: 14px;
+    }
+}
+
+.container-sugestoes {  
+    max-width: 600px;  
+    margin: 40px auto;  
+    padding: 20px;  
+    background: #1e2621;  
+    border-radius: 12px;  
+    color: white;  
+    border: 1px solid #a3e4d7;  
+    font-family: Arial, sans-serif;  
+}
+
+.container-sugestoes input,  
+.container-sugestoes textarea {  
+    width: 100%;  
+    padding: 10px;  
+    margin-top: 5px;  
+    margin-bottom: 15px;  
+    border-radius: 6px;  
+    border: 1px solid #555;  
+    background: #2a352f;  
+    color: white;  
+    box-sizing: border-box;  
+}
+
+.lista-sugestoes {  
+    margin-top: 30px;  
+}
+
+.item-sugestao {  
+    background: #2a352f;  
+    padding: 15px;  
+    border-radius: 8px;  
+    margin-bottom: 10px;  
+    border-left: 4px solid #00b4d8;  
+} 

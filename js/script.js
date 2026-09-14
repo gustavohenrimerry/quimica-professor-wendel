@@ -31,7 +31,7 @@ function boasVindas(){
 boasVindas();
 
 async function fazerLoginProfessor(email, senha) {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await window.meuClienteSupabase.auth.signInWithPassword({
         email: email,
         password: senha,
     });
@@ -47,7 +47,7 @@ async function fazerLoginProfessor(email, senha) {
 }
 
 async function fazerLogoutProfessor() {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await window.meuClienteSupabase.auth.signOut();
     if (!error) {
         alert("Logout realizado com sucesso!");
         window.location.reload();
@@ -57,11 +57,11 @@ async function fazerLogoutProfessor() {
 }
 
 async function verificarSessaoProfessor() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await window.meuClienteSupabase.auth.getSession();
     
     const botoesAdmin = document.querySelectorAll('.admin-only'); 
 
-    if (session) {
+    if (session && session.user) {
         console.log("Professor logado:", session.user.email);
         
         botoesAdmin.forEach(el => el.style.display = 'block');

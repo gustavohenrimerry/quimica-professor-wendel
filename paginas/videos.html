@@ -119,9 +119,8 @@
 </footer>
 
 <script>
-    const SUPABASE_URL = 'https://ahstdxgglfgjfeuurkqg.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhaHN0ZHhnbGZnamZldXVya3FnIi';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Usa o cliente global já inicializado em supabaseClient.js
+    const supabaseClient = window.meuClienteSupabase;
 
     const videosPadrao = [
         { id: 'vid-1', categoria: '6º Ano - Química Básica', titulo: 'Substâncias e Misturas', video: 'https://www.youtube.com/embed/hbwKwNhIFM4', descricao: 'Introdução à Química, matéria, objetos e substâncias.' },
@@ -147,7 +146,11 @@
     async function inicializarBancoVideos() {
         try {
             let { data, error } = await supabaseClient.from('videos').select('*');
-            if (error || !data || data.length === 0) {
+            if (error) {
+                console.error("Erro ao verificar dados:", error.message);
+                return;
+            }
+            if (!data || data.length === 0) {
                 for (let v of videosPadrao) {
                     await supabaseClient.from('videos').insert([v]);
                 }
@@ -157,12 +160,17 @@
         }
     }
 
-    function verificarSeProfessor() {
-        return sessionStorage.getItem('professor_autenticado') === 'true';
+    async function verificarSeProfessor() {
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            return !!session;
+        } catch (e) {
+            return false;
+        }
     }
 
-    function verificarEstadoProfessorInicial() {
-        if (verificarSeProfessor()) {
+    async function verificarEstadoProfessorInicial() {
+        if (await verificarSeProfessor()) {
             document.getElementById('btn-painel-toggle').style.background = '#16a34a';
             document.getElementById('btn-painel-toggle').innerText = '🔓 Painel do Professor (Ativo)';
             document.getElementById('btn-novo-vid').style.display = 'block';
@@ -174,19 +182,18 @@
     async function alternarPainelAdmin() {
         let painel = document.getElementById('painel-admin');
         
-        if (!verificarSeProfessor()) {
+        if (!(await verificarSeProfessor())) {
             let email = prompt("E-mail de acesso do professor:");
             if (!email) return;
             let senha = prompt("Senha de acesso:");
             if (!senha) return;
 
-            let { data, error } = await supabaseClient.auth.signInWithPassword({ email, senha });
+            let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
             if (error) {
                 alert("Erro ao entrar: " + error.message);
                 return;
             }
 
-            sessionStorage.setItem('professor_autenticado', 'true');
             document.getElementById('btn-painel-toggle').style.background = '#16a34a';
             document.getElementById('btn-painel-toggle').innerText = '🔓 Painel do Professor (Ativo)';
             document.getElementById('btn-novo-vid').style.display = 'block';
@@ -207,7 +214,6 @@
 
     async function sairModoProfessor() {
         await supabaseClient.auth.signOut();
-        sessionStorage.removeItem('professor_autenticado');
         document.getElementById('painel-admin').style.display = 'none';
         document.getElementById('btn-painel-toggle').style.background = '#7c3aed';
         document.getElementById('btn-painel-toggle').innerText = '🔐 Painel do Professor';
@@ -216,20 +222,19 @@
     }
 
     async function pedirSenhaOuLiberar() {
-        if (verificarSeProfessor()) return true;
+        if (await verificarSeProfessor()) return true;
 
         let email = prompt("E-mail de acesso do professor:");
         if (!email) return false;
         let senha = prompt("Senha de acesso:");
         if (!senha) return false;
 
-        let { data, error } = await supabaseClient.auth.signInWithPassword({ email, senha });
+        let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
         if (error) {
             alert("Senha ou e-mail incorretos!");
             return false;
         }
 
-        sessionStorage.setItem('professor_autenticado', 'true');
         document.getElementById('btn-painel-toggle').style.background = '#16a34a';
         document.getElementById('btn-painel-toggle').innerText = '🔓 Painel do Professor (Ativo)';
         document.getElementById('btn-novo-vid').style.display = 'block';
@@ -270,7 +275,7 @@
         let containerPrincipal = document.getElementById('container-categorias-videos');
         containerPrincipal.innerHTML = "";
         let videos = await obterVideos();
-        let eProfessor = verificarSeProfessor();
+        let eProfessor = await verificarSeProfessor();
 
         let categoriasOrdem = [
             '6º Ano - Química Básica',
@@ -474,7 +479,7 @@
     }
 
     async function excluirComentario(dbId, idVid) {
-        if (!verificarSeProfessor()) {
+        if (!(await verificarSeProfessor())) {
             alert("Apenas o Professor pode apagar comentários. Ative o Painel do Professor primeiro!");
             return;
         }
@@ -520,8 +525,8 @@
         return "há " + diferencaDias + (diferencaDias === 1 ? " dia" : " dias");
     }
 
-    function adicionarElementoComentario(lista, autor, texto, tempo, idVid, dbId) {
-        let eProfessor = verificarSeProfessor();
+    async function adicionarElementoComentario(lista, autor, texto, tempo, idVid, dbId) {
+        let eProfessor = await verificarSeProfessor();
 
         let novoComentario = document.createElement("div");
         novoComentario.style.background = "#2a2a2a";

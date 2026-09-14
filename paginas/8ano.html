@@ -154,7 +154,11 @@ Química com Professor Wendel
     async function inicializarBancoCards8Ano() {
         try {
             let { data, error } = await supabaseClient.from('conteudos_8ano').select('*');
-            if (error || !data || data.length === 0) {
+            if (error) {
+                console.error("Erro ao verificar dados:", error.message);
+                return;
+            }
+            if (!data || data.length === 0) {
                 for (let card of cardsPadrao8Ano) {
                     await supabaseClient.from('conteudos_8ano').insert([card]);
                 }
@@ -184,7 +188,7 @@ Química com Professor Wendel
             return;
         }
 
-        let { data, error } = await supabaseClient.auth.signInWithPassword({ email, senha });
+        let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
         if (error) {
             alert("Erro ao entrar: " + error.message);
             return;

@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Login do Professor - Química com Professor Wendel</title>
-
-<link rel="stylesheet" href="css/style.css">
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabaseClient.js"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login do Professor - Química com Professor Wendel</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
 <style>
     .container-login {
         max-width: 400px;
@@ -167,69 +163,6 @@
 
 </div>
 
-<script>
-    const formulario = document.getElementById("form-login");
-    const emailInput = document.getElementById("email-login");
-    const senhaInput = document.getElementById("senha-login");
-    const botao = document.getElementById("botao-login");
-    const mensagem = document.getElementById("mensagem");
-
-    function mostrarMensagem(texto, tipo) {
-        mensagem.textContent = texto;
-        mensagem.className = "mensagem " + tipo;
-    }
-
-    formulario.addEventListener("submit", async function (event) {
-        event.preventDefault();
-
-        const email = emailInput.value.trim();
-        const senha = senhaInput.value;
-
-        if (!email) {
-            mostrarMensagem("Digite seu e-mail.", "erro");
-            emailInput.focus();
-            return;
-        }
-
-        if (!senha) {
-            mostrarMensagem("Digite sua senha.", "erro");
-            senhaInput.focus();
-            return;
-        }
-
-        botao.disabled = true;
-        botao.textContent = "Entrando...";
-        mensagem.style.display = "none";
-
-        try {
-            const { data, error } = await window.meuClienteSupabase.auth.signInWithPassword({
-                email: email,
-                password: senha
-            });
-
-            if (error) {
-                console.error(error);
-                mostrarMensagem("❌ E-mail ou senha incorretos.", "erro");
-                botao.disabled = false;
-                botao.textContent = "Entrar";
-                return;
-            }
-
-            if (data.session) {
-                mostrarMensagem("✅ Login realizado! Redirecionando...", "sucesso");
-
-                setTimeout(function () {
-                    window.location.href = "index.html";
-                }, 1000);
-            }
-        } catch (err) {
-            console.error(err);
-            mostrarMensagem("❌ Ocorreu um erro inesperado.", "erro");
-            botao.disabled = false;
-            botao.textContent = "Entrar";
-        }
-    });
-</script>
 
 </body>
 </html>
