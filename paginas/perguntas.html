@@ -9,43 +9,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabaseClient.js"></script>
+<script src="../js/utils.js"></script>
 
 <style>
-    header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: nowrap;
-        padding: 15px 30px;
-    }
-
-    header .logo a {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        text-decoration: none;
-        color: inherit;
-    }
-
-    header .logo img {
-        height: 40px;
-        width: 40px;
-        object-fit: contain;
-    }
-
-    header .logo span {
-        font-size: 20px;
-        font-weight: bold;
-        color: #fff;
-    }
-
-    header nav {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        flex-wrap: nowrap;
-    }
-
     .acoes-professor {
         display: none;
         justify-content: flex-end;
@@ -105,6 +71,18 @@
 
 <body>
 
+<div id="barra-admin">
+    <span id="status-admin" style="color: #a3e4d7; font-weight: bold; margin-right: 15px;">🔒 Modo Visitante</span>
+    <div id="bloco-login" style="display: inline-block;">
+        <input type="email" id="email-prof" placeholder="E-mail do Professor" style="width: 180px;">
+        <input type="password" id="senha-prof" placeholder="Senha" style="width: 140px;">
+        <button onclick="entrarAdmin()" style="background: #00b4d8; color: white;">Entrar</button>
+    </div>
+    <div id="botoes-admin" style="display: none;">
+        <button onclick="sairAdmin()" style="background: #dc3545; color: white; margin-left: 5px;">Sair</button>
+    </div>
+</div>
+
 <header>
 <div class="logo">
     <a href="../index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px; color: inherit;">
@@ -120,11 +98,10 @@
         <a href="perguntas.html">Perguntas</a>
         <a href="professor.html">Professor</a>
         <a href="../sugestoes.html">Sugestões</a>
-        <a href="#" id="btn-modo-professor" onclick="toggleModoProfessor()" style="color: #ffeb3b;">🔓 Painel do Professor (Inativo)</a>
 </nav>
 </header>
 
-<section class="banner">
+<section class="banner-paginas">
 <h1>
 ❓ Perguntas e Respostas de Química
 </h1>
@@ -134,7 +111,7 @@ Revise os conteúdos e teste seus conhecimentos com níveis variados.
 </section>
 
 <section>
-<h2>🟢 Nível Fácil</h2>
+<h2 style="color: white">🟢 Nível Fácil</h2>
 <div class="painel-adicionar">
     <button class="btn-adicionar-card" onclick="adicionarCard('facil')">➕ Adicionar Pergunta (Fácil)</button>
 </div>
@@ -143,7 +120,7 @@ Revise os conteúdos e teste seus conhecimentos com níveis variados.
 </section>
 
 <section>
-<h2>🟡 Nível Médio</h2>
+<h2 style="color: white">🟡 Nível Médio</h2>
 <div class="painel-adicionar">
     <button class="btn-adicionar-card" onclick="adicionarCard('medio')">➕ Adicionar Pergunta (Médio)</button>
 </div>
@@ -152,7 +129,7 @@ Revise os conteúdos e teste seus conhecimentos com níveis variados.
 </section>
 
 <section>
-<h2>🔴 Nível Difícil</h2>
+<h2 style="color: white">🔴 Nível Difícil</h2>
 <div class="painel-adicionar">
     <button class="btn-adicionar-card" onclick="adicionarCard('dificil')">➕ Adicionar Pergunta (Difícil)</button>
 </div>
@@ -161,16 +138,10 @@ Revise os conteúdos e teste seus conhecimentos com níveis variados.
 </section>
 
 <footer>
-<p>
-© 2026 - Química com Professor Wendel
-</p>
+    <p>© 2026 - <a href="https://github.com/gustavohenrimerry" target="_blank" rel="noopener noreferrer">Desenvolvido por Gustavo</a></p>
 </footer>
 
 <script>
-    const SUPABASE_URL = 'https://ahstdxgglfgjfeuurkqg.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhaHN0ZHhnbGZnamZldXVya3FnIi';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     const perguntasIniciais = [
         // Fácil
         { nivel: 'facil', pergunta: 'O que é Química?', resposta: 'Química é a ciência que estuda a matéria, suas propriedades e transformações.' },
@@ -231,6 +202,9 @@ Revise os conteúdos e teste seus conhecimentos com níveis variados.
     ];
 
     document.addEventListener("DOMContentLoaded", async function() {
+        if (await verificarSeProfessor()) {
+            document.body.classList.add('modo-professor');
+        }
         await inicializarBancoPerguntas();
         renderizarPerguntas();
     });
@@ -238,7 +212,11 @@ Revise os conteúdos e teste seus conhecimentos com níveis variados.
     async function inicializarBancoPerguntas() {
         try {
             let { data, error } = await supabaseClient.from('perguntas_quimica').select('*');
-            if (error || !data || data.length === 0) {
+            if (error) {
+                console.error("Erro ao verificar dados:", error.message);
+                return;
+            }
+            if (!data || data.length === 0) {
                 for (let p of perguntasIniciais) {
                     await supabaseClient.from('perguntas_quimica').insert([p]);
                 }
@@ -249,32 +227,10 @@ Revise os conteúdos e teste seus conhecimentos com níveis variados.
     }
 
     async function toggleModoProfessor() {
-        const body = document.body;
-        const btn = document.getElementById('btn-modo-professor');
-        
-        if (!body.classList.contains('modo-professor')) {
-            let email = prompt("E-mail de acesso do professor:");
-            if (!email) return;
-            let senha = prompt("Senha de acesso:");
-            if (!senha) return;
-
-            let { data, error } = await supabaseClient.auth.signInWithPassword({ email, senha });
-            if (error) {
-                alert("Erro ao entrar: " + error.message);
-                return;
-            }
+        if (!(await verificarSeProfessor())) {
+            await loginViaPainel();
         } else {
-            await supabaseClient.auth.signOut();
-        }
-
-        body.classList.toggle('modo-professor');
-        
-        if (body.classList.contains('modo-professor')) {
-            btn.innerText = "🔒 Painel do Professor (Ativo)";
-            btn.style.color = "#4CAF50";
-        } else {
-            btn.innerText = "🔓 Painel do Professor (Inativo)";
-            btn.style.color = "#ffeb3b";
+            await logoutProfessor();
         }
     }
 
@@ -320,6 +276,11 @@ Revise os conteúdos e teste seus conhecimentos com níveis variados.
     }
 
     async function adicionarCard(nivel) {
+        if (!(await verificarSeProfessor())) {
+            const logou = await loginViaPainel();
+            if (!logou) return;
+        }
+
         const novaPergunta = prompt("Digite a nova pergunta:");
         if (!novaPergunta || novaPergunta.trim() === "") return;
 
@@ -342,6 +303,11 @@ Revise os conteúdos e teste seus conhecimentos com níveis variados.
     }
 
     async function excluirCard(id) {
+        if (!(await verificarSeProfessor())) {
+            alert("Apenas o Professor pode excluir perguntas.");
+            return;
+        }
+
         if (confirm("Tem certeza que deseja excluir esta pergunta?")) {
             let { error } = await supabaseClient.from('perguntas_quimica').delete().eq('id', id);
             if (error) {
@@ -354,6 +320,10 @@ Revise os conteúdos e teste seus conhecimentos com níveis variados.
     }
 
     async function editarCard(id) {
+        if (!(await verificarSeProfessor())) {
+            alert("Apenas o Professor pode editar perguntas.");
+            return;
+        }
         let { data } = await supabaseClient.from('perguntas_quimica').select('*').eq('id', id);
         let item = data ? data[0] : null;
         if (!item) return;

@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="css/style.css">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  
-<script src="js/supabaseClient.js"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/utils.js"></script>
     <style>  
         .container-sugestoes {  
             max-width: 600px;  
@@ -49,24 +50,32 @@
 </head>
 <body>
 
+<div id="barra-admin">
+    <span id="status-admin" style="color: #a3e4d7; font-weight: bold; margin-right: 15px;">🔒 Modo Visitante</span>
+    <div id="bloco-login" style="display: inline-block;">
+        <input type="email" id="email-prof" placeholder="E-mail do Professor" style="width: 180px;">
+        <input type="password" id="senha-prof" placeholder="Senha" style="width: 140px;">
+        <button onclick="entrarAdmin()" style="background: #00b4d8; color: white;">Entrar</button>
+    </div>
+    <div id="botoes-admin" style="display: none;">
+        <button onclick="sairAdmin()" style="background: #dc3545; color: white; margin-left: 5px;">Sair</button>
+    </div>
+</div>
+
 <header>
-    <div class="logo">  
+    <div class="logo">
         <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px; color: inherit;">  
-            <img src="assets/imagens/logo/logo.png" alt="Logo">  
-            <span>Química com Professor Wendel</span>  
-        </a>  
+        <img src="assets/imagens/logo/logo.png" alt="Logo Química com Professor Wendel">
+        Química com Professor Wendel
     </div>
 
-    <nav>  
-        <a href="index.html">Início</a>  
-        <a href="paginas/experimentos.html">Experimentos</a>  
-        <a href="paginas/videos.html">Vídeos</a>  
-        <a href="paginas/perguntas.html">Perguntas</a>  
-        <a href="paginas/professor.html">Professor</a>  
-        <a href="sugestoes.html">Sugestões</a>  
-        <span id="status-login" style="color:#a3e4d7; font-size:14px;">Verificando...</span>  
-        <a href="login.html" id="link-login" style="color: #a3e4d7; font-weight: bold;">🔑 Login</a>  
-        <button id="btn-sair" style="display:none; background:#dc3545; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">🚪 Sair</button>  
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="paginas/experimentos.html">Experimentos</a>
+        <a href="paginas/videos.html">Vídeos</a>
+        <a href="paginas/perguntas.html">Perguntas</a>
+        <a href="paginas/professor.html">Professor</a>
+        <a href="sugestoes.html">Sugestões</a>
     </nav>
 </header>
 
@@ -94,43 +103,16 @@
 </div>
 
 <footer>  
-    <p>Química com Professor Wendel</p>  
+    <p>© 2026 - <a href="https://github.com/gustavohenrimerry" target="_blank" rel="noopener noreferrer">Desenvolvido por Gustavo</a></p>  
 </footer>
 
 <script>
-    async function verificarLogin() {  
-        const { data: { session } } = await window.meuClienteSupabase.auth.getSession();
-
-        const status = document.getElementById("status-login");  
-        const login = document.getElementById("link-login");  
-        const sairBtn = document.getElementById("btn-sair");
-
-        if (session) {  
-            if (status) status.textContent = "👤 " + (session.user.email || "Usuário");  
-            if (login) login.style.display = "none";  
-            if (sairBtn) sairBtn.style.display = "inline-block";  
-        } else {  
-            if (status) status.textContent = "Visitante";  
-            if (login) login.style.display = "inline-block";  
-            if (sairBtn) sairBtn.style.display = "none";  
-        }  
-    }
-
-    async function sair() {  
-        const { error } = await window.meuClienteSupabase.auth.signOut();  
-        if (error) {  
-            alert("Erro ao sair: " + error.message);  
-            return;  
-        }  
-        window.location.href = "login.html";  
-    }
-
     async function verificarAcessoProfessor() {  
-        const { data: { session } } = await window.meuClienteSupabase.auth.getSession();  
+        const eProf = await verificarSeProfessor();
         const painel = document.getElementById("painel-professor");  
         if (!painel) return;
 
-        if (session && session.user.email?.toLowerCase() === window.EMAIL_PROFESSOR.toLowerCase()) {  
+        if (eProf) {  
             painel.style.display = "block";  
             if (typeof carregarSugestoesAdmin === "function") {  
                 carregarSugestoesAdmin();  
@@ -141,13 +123,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {  
-        verificarLogin();  
         verificarAcessoProfessor();
-
-        const btnSair = document.getElementById("btn-sair");  
-        if (btnSair) {  
-            btnSair.addEventListener("click", sair);  
-        }  
     });
 
     async function enviarSugestao() {  

@@ -69,7 +69,102 @@ nav a:hover {
     color: #a3e4d7;
 }
 
-/* --- Banner --- */
+/* =========================================================
+   BANNER EXCLUSIVO: PÁGINA INICIAL (.banner-home)
+   ========================================================= */
+.banner-home {
+    min-height: 500px;
+    background: 
+    linear-gradient(
+        rgba(0, 77, 170, 0.8),
+        rgba(0, 77, 170, 0.8)
+    ),
+    url("../assets/imagens/laboratorio.jpg");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    text-align: left;
+    color: #0f4c2c;
+    flex-shrink: 0;
+    padding: 40px 40px;
+    gap: 20px;
+    flex-wrap: nowrap;
+}
+
+.banner-home > div:not(.molecula-lateral):not(.emojis-laterais) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    flex: 1;
+    min-width: 250px;
+}
+
+.banner-home h1 {
+    font-size: 36px;
+    max-width: 700px;
+    color: #ffffff;
+    text-align: left;
+}
+
+.banner-home p {
+    margin: 15px 0;
+    font-size: 16px;
+    color: #e0e0e0;
+    text-align: left;
+}
+
+/* =========================================================
+   BANNER EXCLUSIVO: DEMAIS PÁGINAS (.banner-paginas)
+   (Idêntico ao inicial para ajuste manual independente)
+   ========================================================= */
+.banner-paginas {
+    min-height: 300px;
+    background: 
+    linear-gradient(
+        rgba(0, 77, 170, 0.8),
+        rgba(0, 77, 170, 0.8)
+    ),
+    url("../assets/imagens/laboratorio.jpg");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    text-align: left;
+    color: #0f4c2c;
+    flex-shrink: 0;
+    padding: 40px 40px;
+    gap: 20px;
+    flex-wrap: nowrap;
+}
+
+.banner-paginas > div:not(.molecula-lateral):not(.emojis-laterais) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    flex: 1;
+    min-width: 250px;
+}
+
+.banner-paginas h1 {
+    font-size: 36px;
+    max-width: 700px;
+    color: #ffffff;
+    text-align: left;
+}
+
+.banner-paginas p {
+    margin: 15px 0;
+    font-size: 16px;
+    color: #e0e0e0;
+    text-align: left;
+}
+
+/* Compatibilidade retroativa */
 .banner {
     min-height: 500px;
     background: 
@@ -114,17 +209,7 @@ nav a:hover {
     text-align: left;
 }
 
-.molecula-lateral {
-    width: 400px;
-    height: 400px;
-    min-width: 400px;
-    min-height: 400px;
-    z-index: 10;
-    display: block;
-    background: transparent;
-    border: none;
-    flex-shrink: 0;
-}
+
 
 /* Caixa dos emojis na direita com exatamente o mesmo tamanho para equiparar com a molécula */
 .emojis-laterais {
@@ -190,7 +275,7 @@ h2 {
     margin: 0 auto;
     font-size: 18px;
     line-height: 1.6;
-    text-align: center;
+    text-align:center
 }
 
 /* --- Contêiner de Cards --- */
@@ -209,18 +294,17 @@ h2 {
 }
 
 .card {
-    background: white;
-    width: 100% !important;
-    max-width: 320px !important;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    text-align: center;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-sizing: border-box !important;
+        background: #1e1e1e !important;
+        border: 1px solid #333 !important;
+        padding: 20px !important;
+        border-radius: 8px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        height: auto !important;
+        min-height: 100% !important;
+        box-sizing: border-box !important;
+        float: none !important;
 }
 
 .card h3 {
@@ -230,7 +314,7 @@ h2 {
 
 .card p {
     margin-bottom: 20px;
-    color: #333333;
+    color: #ffffff;
 }
 
 .card a {
@@ -307,3 +391,228 @@ footer {
     flex-shrink: 0;
     margin-top: auto;
 }
+
+footer a {
+    color: inherit;
+    text-decoration: underline;
+    font-weight: bold;
+    transition: opacity 0.2s;
+}
+
+footer a:hover {
+    opacity: 0.8;
+}
+
+#barra-admin {
+    background: #1b3b2b;
+    padding: 12px; 
+    text-align: center; 
+    border-bottom: 2px solid #a3e4d7; 
+    font-family: Arial, sans-serif; 
+    position: sticky; 
+    top: 0; 
+    z-index: 1000; 
+}
+
+#barra-admin input {
+    padding: 6px 10px; 
+    border-radius: 4px; 
+    border: 1px solid #333; 
+    outline: none; 
+    margin-right: 5px; 
+    background: #2a352f;
+    color: white;
+}
+
+#barra-admin input:focus {
+    border-color: #a3e4d7;
+}
+
+#barra-admin button { 
+    padding: 6px 12px; 
+    border-radius: 4px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    border: none; 
+    transition: opacity 0.2s;
+}
+
+#barra-admin button:hover {
+    opacity: 0.9;
+}
+
+.modal-admin { 
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.8); 
+    z-index: 2000; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.modal-content-admin { 
+    background: #1e2621; 
+    padding: 30px; 
+    border-radius: 12px; 
+    width: 90%; 
+    max-width: 500px; 
+    color: white; 
+    border: 1px solid #a3e4d7; 
+    text-align: left; 
+}
+
+.modal-content-admin input, .modal-content-admin textarea { 
+    width: 100%; 
+    padding: 10px; 
+    margin-top: 5px; 
+    margin-bottom: 15px; 
+    border-radius: 6px; 
+    border: 1px solid #555; 
+    background: #2a352f; 
+    color: white; 
+    box-sizing: border-box; 
+}
+
+.acoes-artigo { 
+    display: none !important; 
+}
+
+article.modo-admin { 
+    position: relative; 
+    border: 2px dashed #00b4d8; 
+    padding-bottom: 15px; 
+}
+
+article.modo-admin .acoes-artigo { 
+    display: flex !important; 
+    margin-top: 10px; gap: 8px; 
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    header {
+        padding: 15px 20px;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    nav {
+        margin-top: 10px;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    nav a {
+        margin-left: 0;
+        padding: 5px 8px;
+        font-size: 14px;
+    }
+
+    /* Banner Home - Mobile */
+    .banner-home {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .banner-home h1 {
+        font-size: 30px;
+        text-align: center;
+    }
+
+    .banner-home p {
+        font-size: 16px;
+        text-align: center;
+    }
+
+    /* Banner Demais Páginas - Mobile */
+    .banner-paginas {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .banner-paginas h1 {
+        font-size: 30px;
+        text-align: center;
+    }
+
+    .banner-paginas p {
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .banner {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .banner h1 {
+        font-size: 30px;
+        text-align: center;
+    }
+
+    .banner p {
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .emojis-laterais, .molecula-lateral {
+        width: 300px;
+        height: 300px;
+        min-width: 300px;
+        min-height: 300px;
+    }
+
+    .series {
+        padding: 15px 10px;
+    }
+
+    .series a {
+        flex: 1 1 42%;
+        max-width: none;
+        padding: 12px 10px;
+        font-size: 14px;
+    }
+}
+
+.container-sugestoes {  
+    max-width: 600px;  
+    margin: 40px auto;  
+    padding: 20px;  
+    background: #1e2621;  
+    border-radius: 12px;  
+    color: white;  
+    border: 1px solid #a3e4d7;  
+    font-family: Arial, sans-serif;  
+}
+
+.container-sugestoes input,  
+.container-sugestoes textarea {  
+    width: 100%;  
+    padding: 10px;  
+    margin-top: 5px;  
+    margin-bottom: 15px;  
+    border-radius: 6px;  
+    border: 1px solid #555;  
+    background: #2a352f;  
+    color: white;  
+    box-sizing: border-box;  
+}
+
+.lista-sugestoes {  
+    margin-top: 30px;  
+}
+
+.item-sugestao {  
+    background: #2a352f;  
+    padding: 15px;  
+    border-radius: 8px;  
+    margin-bottom: 10px;  
+    border-left: 4px solid #00b4d8;  
+} 

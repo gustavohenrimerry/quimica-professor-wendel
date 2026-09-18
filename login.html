@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Login do Professor - Química com Professor Wendel</title>
-
-<link rel="stylesheet" href="css/style.css">
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabaseClient.js"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login do Professor - Química com Professor Wendel</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabaseClient.js"></script>
 <style>
     .container-login {
         max-width: 400px;
@@ -167,69 +163,45 @@
 
 </div>
 
+<script src="js/utils.js"></script>
 <script>
-    const formulario = document.getElementById("form-login");
-    const emailInput = document.getElementById("email-login");
-    const senhaInput = document.getElementById("senha-login");
-    const botao = document.getElementById("botao-login");
-    const mensagem = document.getElementById("mensagem");
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("form-login");
+        const msg = document.getElementById("mensagem");
+        const btn = document.getElementById("botao-login");
 
-    function mostrarMensagem(texto, tipo) {
-        mensagem.textContent = texto;
-        mensagem.className = "mensagem " + tipo;
-    }
+        if (form) {
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const email = document.getElementById("email-login").value.trim();
+                const senha = document.getElementById("senha-login").value;
 
-    formulario.addEventListener("submit", async function (event) {
-        event.preventDefault();
+                if (!email || !senha) return;
 
-        const email = emailInput.value.trim();
-        const senha = senhaInput.value;
+                btn.disabled = true;
+                btn.innerText = "Entrando...";
+                msg.className = "mensagem";
+                msg.style.display = "none";
 
-        if (!email) {
-            mostrarMensagem("Digite seu e-mail.", "erro");
-            emailInput.focus();
-            return;
-        }
-
-        if (!senha) {
-            mostrarMensagem("Digite sua senha.", "erro");
-            senhaInput.focus();
-            return;
-        }
-
-        botao.disabled = true;
-        botao.textContent = "Entrando...";
-        mensagem.style.display = "none";
-
-        try {
-            const { data, error } = await window.meuClienteSupabase.auth.signInWithPassword({
-                email: email,
-                password: senha
+                const res = await fazerLogin(email, senha);
+                if (res && res.sucesso) {
+                    msg.className = "mensagem sucesso";
+                    msg.innerText = "Login realizado com sucesso! Redirecionando...";
+                    setTimeout(() => {
+                        window.location.href = "index.html";
+                    }, 1000);
+                } else {
+                    btn.disabled = false;
+                    btn.innerText = "Entrar";
+                    msg.className = "mensagem erro";
+                    msg.innerText = "Erro ao entrar: " + (res && res.erro ? res.erro : "Credenciais inválidas");
+                }
             });
-
-            if (error) {
-                console.error(error);
-                mostrarMensagem("❌ E-mail ou senha incorretos.", "erro");
-                botao.disabled = false;
-                botao.textContent = "Entrar";
-                return;
-            }
-
-            if (data.session) {
-                mostrarMensagem("✅ Login realizado! Redirecionando...", "sucesso");
-
-                setTimeout(function () {
-                    window.location.href = "index.html";
-                }, 1000);
-            }
-        } catch (err) {
-            console.error(err);
-            mostrarMensagem("❌ Ocorreu um erro inesperado.", "erro");
-            botao.disabled = false;
-            botao.textContent = "Entrar";
         }
     });
 </script>
-
+<footer>
+    <p>© 2026 - <a href="https://github.com/gustavohenrimerry" target="_blank" rel="noopener noreferrer">Desenvolvido por Gustavo</a></p>
+</footer>
 </body>
 </html>

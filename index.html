@@ -9,20 +9,8 @@
 
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabaseClient.js"></script>
-    <style>
-        #barra-admin { background: #1b3b2b; padding: 12px; text-align: center; border-bottom: 2px solid #a3e4d7; font-family: Arial, sans-serif; position: sticky; top: 0; z-index: 1000; }
-        #barra-admin input { padding: 6px; border-radius: 4px; border: none; outline: none; margin-right: 5px; }
-        #barra-admin button { padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; }
-        
-        .modal-admin { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content-admin { background: #1e2621; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; color: white; border: 1px solid #a3e4d7; text-align: left; }
-        .modal-content-admin input, .modal-content-admin textarea { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #555; background: #2a352f; color: white; box-sizing: border-box; }
-        
-        .acoes-artigo { display: none !important; }
-        article.modo-admin { position: relative; border: 2px dashed #00b4d8; padding-bottom: 15px; }
-        article.modo-admin .acoes-artigo { display: flex !important; margin-top: 10px; gap: 8px; }
-    </style>
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/utils.js"></script>
 </head>
 
 <body>
@@ -30,7 +18,9 @@
 <div id="barra-admin">
     <span id="status-admin" style="color: #a3e4d7; font-weight: bold; margin-right: 15px;">🔒 Modo Visitante</span>
     <div id="bloco-login" style="display: inline-block;">
-        <a href="login.html" style="background: #00b4d8; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-weight: bold; display: inline-block;">Entrar (Login)</a>
+        <input type="email" id="email-prof" placeholder="E-mail do Professor" style="width: 180px;">
+        <input type="password" id="senha-prof" placeholder="Senha" style="width: 140px;">
+        <button onclick="entrarAdmin()" style="background: #00b4d8; color: white;">Entrar</button>
     </div>
     <div id="botoes-admin" style="display: none;">
         <button onclick="abrirModalCuriosidade()" style="background: #28a745; color: white;">➕ Adicionar Curiosidade</button>
@@ -61,6 +51,7 @@
 
 <header>
     <div class="logo">
+        <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px; color: inherit;">  
         <img src="assets/imagens/logo/logo.png" alt="Logo Química com Professor Wendel">
         Química com Professor Wendel
     </div>
@@ -75,7 +66,7 @@
     </nav>
 </header>
 
-<section class="banner">
+<section class="banner-home">
     <model-viewer 
         class="molecula-lateral"
         src="quiz/molecule.glb" 
@@ -87,7 +78,8 @@
         camera-orbit="0deg 75deg 105%"
         environment-image="neutral"
         exposure="1.2"
-        shadow-intensity="1">
+        shadow-intensity="1"
+        style="min-width: 400px; min-height: 400px; z-index: 10;display: block;background: transparent;border: none;flex-shrink: 0;">
     </model-viewer>
 
     <div>
@@ -250,199 +242,10 @@
 </section>
 
 <footer>
-    <p>© 2026 - Química com Professor Wendel</p>
-    <p>Aprendendo ciência através da curiosidade.</p>
+    <p>© 2026 - <a href="https://github.com/gustavohenrimerry" target="_blank" rel="noopener noreferrer">Desenvolvido por Gustavo </a></p>
 </footer>
 
 <script src="js/script.js"></script>
-<script>
-    let modoAdminAtivo = false;
-
-    document.addEventListener("DOMContentLoaded", async () => {
-        removerCuriosidadesExcluidas();
-        
-        if (window.meuClienteSupabase) {
-            const { data: { session } } = await window.meuClienteSupabase.auth.getSession();
-            if (session) {
-                modoAdminAtivo = true;
-                ativarInterfaceAdmin();
-            }
-        }
-
-        carregarCuriosidadesSalvas();
-    });
-
-    function ativarInterfaceAdmin() {
-        document.getElementById('status-admin').innerText = "🔓 Modo Professor Ativo";
-        document.getElementById('bloco-login').style.display = 'none';
-        document.getElementById('botoes-admin').style.display = 'inline-block';
-        aplicarModoAdmin();
-    }
-
-    async function sairAdmin() {
-        if (window.meuClienteSupabase) {
-            await window.meuClienteSupabase.auth.signOut();
-        }
-        modoAdminAtivo = false;
-        document.getElementById('status-admin').innerText = "🔒 Modo Visitante";
-        document.getElementById('bloco-login').style.display = 'inline-block';
-        document.getElementById('botoes-admin').style.display = 'none';
-        window.location.reload();
-    }
-
-    function abrirModalCuriosidade(id = "", titulo = "", texto = "") {
-        if (!modoAdminAtivo) return;
-        document.getElementById('curiosidade-id').value = id;
-        document.getElementById('curiosidade-titulo').value = titulo;
-        document.getElementById('curiosidade-texto').value = texto;
-        document.getElementById('curiosidade-foto').value = "";
-        
-        if (id) {
-            document.getElementById('modal-titulo-curiosidade').innerText = "Editar Curiosidade";
-        } else {
-            document.getElementById('modal-titulo-curiosidade').innerText = "Nova Curiosidade";
-        }
-        
-        document.getElementById('modal-curiosidade').style.display = "flex";
-    }
-
-    function fecharModalCuriosidade() {
-        document.getElementById('modal-curiosidade').style.display = "none";
-    }
-
-    function salvarCuriosidade() {
-        if (!modoAdminAtivo) return;
-        const id = document.getElementById('curiosidade-id').value || 'custom_' + Date.now();
-        const titulo = document.getElementById('curiosidade-titulo').value;
-        const texto = document.getElementById('curiosidade-texto').value;
-        const inputFoto = document.getElementById('curiosidade-foto');
-
-        if (!titulo || !texto) {
-            alert("Preencha o título e o texto!");
-            return;
-        }
-
-        let customizadas = JSON.parse(localStorage.getItem('index_curiosidades')) || [];
-
-        function finalizarSalvamento(urlFoto) {
-            customizadas = customizadas.filter(item => item.id != id);
-            customizadas.unshift({
-                id,
-                titulo,
-                texto,
-                foto: urlFoto || (customizadas.find(item => item.id == id)?.foto || "")
-            });
-            localStorage.setItem('index_curiosidades', JSON.stringify(customizadas));
-            fecharModalCuriosidade();
-            window.location.reload();
-        }
-
-        if (inputFoto.files && inputFoto.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                finalizarSalvamento(e.target.result);
-            };
-            reader.readAsDataURL(inputFoto.files[0]);
-        } else {
-            finalizarSalvamento(null);
-        }
-    }
-
-    function removerCuriosidadesExcluidas() {
-        let excluidas = JSON.parse(localStorage.getItem('curiosidades_excluidas')) || [];
-        excluidas.forEach(id => {
-            let art = document.querySelector(`article[data-id="${id}"]`);
-            if (art) art.remove();
-        });
-    }
-
-    function carregarCuriosidadesSalvas() {
-        let customizadas = JSON.parse(localStorage.getItem('index_curiosidades')) || [];
-        let excluidas = JSON.parse(localStorage.getItem('curiosidades_excluidas')) || [];
-        const secaoBlog = document.getElementById('secao-blog');
-
-        customizadas.slice().reverse().forEach(item => {
-            if (excluidas.includes(String(item.id))) return;
-            let artigoExistente = document.querySelector(`article[data-id="${item.id}"]`);
-            
-            if (artigoExistente) {
-                artigoExistente.querySelector('h3').innerText = item.titulo;
-                artigoExistente.querySelector('p').innerText = item.texto;
-                if (item.foto) {
-                    let imgTag = artigoExistente.querySelector('img');
-                    if (imgTag) {
-                        imgTag.src = item.foto;
-                    } else {
-                        const novaImg = document.createElement('img');
-                        novaImg.src = item.foto;
-                        novaImg.style.cssText = "width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;";
-                        artigoExistente.insertBefore(novaImg, artigoExistente.firstChild);
-                    }
-                }
-            } else {
-                const article = document.createElement('article');
-                article.setAttribute('data-id', item.id);
-                article.innerHTML = `
-                    ${item.foto ? `<img src="${item.foto}" alt="${item.titulo}" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">` : ''}
-                    <h3>${item.titulo}</h3>
-                    <p>${item.texto}</p>
-                    <div class="acoes-artigo">
-                        <button onclick="editarCuriosidade('${item.id}')" style="background: #ffc107; color: black; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">✏️ Editar</button>
-                        <button onclick="excluirCuriosidade('${item.id}')" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">🗑️ Excluir</button>
-                    </div>
-                `;
-                if (modoAdminAtivo) {
-                    article.classList.add('modo-admin');
-                }
-                secaoBlog.insertBefore(article, secaoBlog.children[1]);
-            }
-        });
-    }
-
-    function aplicarModoAdmin() {
-        const artigos = document.querySelectorAll('section.blog article');
-        artigos.forEach(art => {
-            art.classList.add('modo-admin');
-            const id = art.getAttribute('data-id');
-            if (!art.querySelector('.acoes-artigo')) {
-                const divAcoes = document.createElement('div');
-                divAcoes.className = 'acoes-artigo';
-                divAcoes.innerHTML = `
-                    <button onclick="editarCuriosidade('${id}')" style="background: #ffc107; color: black; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">✏️ Editar</button>
-                    <button onclick="excluirCuriosidade('${id}')" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">🗑️ Excluir</button>
-                `;
-                art.appendChild(divAcoes);
-            }
-        });
-    }
-
-    function editarCuriosidade(id) {
-        if (!modoAdminAtivo) return;
-        const art = document.querySelector(`article[data-id="${id}"]`);
-        if (!art) return;
-        const titulo = art.querySelector('h3').innerText;
-        const texto = art.querySelector('p').innerText;
-        abrirModalCuriosidade(id, titulo, texto);
-    }
-
-    function excluirCuriosidade(id) {
-        if (!modoAdminAtivo) return;
-        if (confirm("Deseja realmente excluir esta curiosidade?")) {
-            
-            let customizadas = JSON.parse(localStorage.getItem('index_curiosidades')) || [];
-            customizadas = customizadas.filter(item => item.id != id);
-            localStorage.setItem('index_curiosidades', JSON.stringify(customizadas));
-
-            let excluidas = JSON.parse(localStorage.getItem('curiosidades_excluidas')) || [];
-            if (!excluidas.includes(String(id))) {
-                excluidas.push(String(id));
-                localStorage.setItem('curiosidades_excluidas', JSON.stringify(excluidas));
-            }
-
-            window.location.reload();
-        }
-    }
-</script>
 
 </body>
 </html>
