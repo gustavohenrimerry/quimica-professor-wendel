@@ -163,6 +163,45 @@
 
 </div>
 
+<script src="js/utils.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("form-login");
+        const msg = document.getElementById("mensagem");
+        const btn = document.getElementById("botao-login");
 
+        if (form) {
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const email = document.getElementById("email-login").value.trim();
+                const senha = document.getElementById("senha-login").value;
+
+                if (!email || !senha) return;
+
+                btn.disabled = true;
+                btn.innerText = "Entrando...";
+                msg.className = "mensagem";
+                msg.style.display = "none";
+
+                const res = await fazerLogin(email, senha);
+                if (res && res.sucesso) {
+                    msg.className = "mensagem sucesso";
+                    msg.innerText = "Login realizado com sucesso! Redirecionando...";
+                    setTimeout(() => {
+                        window.location.href = "index.html";
+                    }, 1000);
+                } else {
+                    btn.disabled = false;
+                    btn.innerText = "Entrar";
+                    msg.className = "mensagem erro";
+                    msg.innerText = "Erro ao entrar: " + (res && res.erro ? res.erro : "Credenciais inválidas");
+                }
+            });
+        }
+    });
+</script>
+<footer>
+    <p>© 2026 - <a href="https://github.com/gustavohenrimerry" target="_blank" rel="noopener noreferrer">Desenvolvido por Gustavo</a></p>
+</footer>
 </body>
 </html>

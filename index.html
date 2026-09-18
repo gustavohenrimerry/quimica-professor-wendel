@@ -10,6 +10,7 @@
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabaseClient.js"></script>
+    <script src="js/utils.js"></script>
 </head>
 
 <body>
@@ -17,7 +18,9 @@
 <div id="barra-admin">
     <span id="status-admin" style="color: #a3e4d7; font-weight: bold; margin-right: 15px;">🔒 Modo Visitante</span>
     <div id="bloco-login" style="display: inline-block;">
-        <a href="login.html" style="background: #00b4d8; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-weight: bold; display: inline-block;">Entrar (Login)</a>
+        <input type="email" id="email-prof" placeholder="E-mail do Professor" style="width: 180px;">
+        <input type="password" id="senha-prof" placeholder="Senha" style="width: 140px;">
+        <button onclick="entrarAdmin()" style="background: #00b4d8; color: white;">Entrar</button>
     </div>
     <div id="botoes-admin" style="display: none;">
         <button onclick="abrirModalCuriosidade()" style="background: #28a745; color: white;">➕ Adicionar Curiosidade</button>
@@ -48,6 +51,7 @@
 
 <header>
     <div class="logo">
+        <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px; color: inherit;">  
         <img src="assets/imagens/logo/logo.png" alt="Logo Química com Professor Wendel">
         Química com Professor Wendel
     </div>
@@ -62,7 +66,7 @@
     </nav>
 </header>
 
-<section class="banner">
+<section class="banner-home">
     <model-viewer 
         class="molecula-lateral"
         src="quiz/molecule.glb" 
@@ -74,7 +78,8 @@
         camera-orbit="0deg 75deg 105%"
         environment-image="neutral"
         exposure="1.2"
-        shadow-intensity="1">
+        shadow-intensity="1"
+        style="min-width: 400px; min-height: 400px; z-index: 10;display: block;background: transparent;border: none;flex-shrink: 0;">
     </model-viewer>
 
     <div>
@@ -237,8 +242,7 @@
 </section>
 
 <footer>
-    <p>© 2026 - Química com Professor Wendel</p>
-    <p>Aprendendo ciência através da curiosidade.</p>
+    <p>© 2026 - <a href="https://github.com/gustavohenrimerry" target="_blank" rel="noopener noreferrer">Desenvolvido por Gustavo </a></p>
 </footer>
 
 <script src="js/script.js"></script>

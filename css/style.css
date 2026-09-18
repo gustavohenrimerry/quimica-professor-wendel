@@ -69,7 +69,102 @@ nav a:hover {
     color: #a3e4d7;
 }
 
-/* --- Banner --- */
+/* =========================================================
+   BANNER EXCLUSIVO: PÁGINA INICIAL (.banner-home)
+   ========================================================= */
+.banner-home {
+    min-height: 500px;
+    background: 
+    linear-gradient(
+        rgba(0, 77, 170, 0.8),
+        rgba(0, 77, 170, 0.8)
+    ),
+    url("../assets/imagens/laboratorio.jpg");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    text-align: left;
+    color: #0f4c2c;
+    flex-shrink: 0;
+    padding: 40px 40px;
+    gap: 20px;
+    flex-wrap: nowrap;
+}
+
+.banner-home > div:not(.molecula-lateral):not(.emojis-laterais) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    flex: 1;
+    min-width: 250px;
+}
+
+.banner-home h1 {
+    font-size: 36px;
+    max-width: 700px;
+    color: #ffffff;
+    text-align: left;
+}
+
+.banner-home p {
+    margin: 15px 0;
+    font-size: 16px;
+    color: #e0e0e0;
+    text-align: left;
+}
+
+/* =========================================================
+   BANNER EXCLUSIVO: DEMAIS PÁGINAS (.banner-paginas)
+   (Idêntico ao inicial para ajuste manual independente)
+   ========================================================= */
+.banner-paginas {
+    min-height: 300px;
+    background: 
+    linear-gradient(
+        rgba(0, 77, 170, 0.8),
+        rgba(0, 77, 170, 0.8)
+    ),
+    url("../assets/imagens/laboratorio.jpg");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    text-align: left;
+    color: #0f4c2c;
+    flex-shrink: 0;
+    padding: 40px 40px;
+    gap: 20px;
+    flex-wrap: nowrap;
+}
+
+.banner-paginas > div:not(.molecula-lateral):not(.emojis-laterais) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    flex: 1;
+    min-width: 250px;
+}
+
+.banner-paginas h1 {
+    font-size: 36px;
+    max-width: 700px;
+    color: #ffffff;
+    text-align: left;
+}
+
+.banner-paginas p {
+    margin: 15px 0;
+    font-size: 16px;
+    color: #e0e0e0;
+    text-align: left;
+}
+
+/* Compatibilidade retroativa */
 .banner {
     min-height: 500px;
     background: 
@@ -114,17 +209,7 @@ nav a:hover {
     text-align: left;
 }
 
-.molecula-lateral {
-    width: 400px;
-    height: 400px;
-    min-width: 400px;
-    min-height: 400px;
-    z-index: 10;
-    display: block;
-    background: transparent;
-    border: none;
-    flex-shrink: 0;
-}
+
 
 /* Caixa dos emojis na direita com exatamente o mesmo tamanho para equiparar com a molécula */
 .emojis-laterais {
@@ -190,7 +275,7 @@ h2 {
     margin: 0 auto;
     font-size: 18px;
     line-height: 1.6;
-    text-align: center;
+    text-align:center
 }
 
 /* --- Contêiner de Cards --- */
@@ -209,18 +294,17 @@ h2 {
 }
 
 .card {
-    background: white;
-    width: 100% !important;
-    max-width: 320px !important;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    text-align: center;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-sizing: border-box !important;
+        background: #1e1e1e !important;
+        border: 1px solid #333 !important;
+        padding: 20px !important;
+        border-radius: 8px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        height: auto !important;
+        min-height: 100% !important;
+        box-sizing: border-box !important;
+        float: none !important;
 }
 
 .card h3 {
@@ -230,7 +314,7 @@ h2 {
 
 .card p {
     margin-bottom: 20px;
-    color: #333333;
+    color: #ffffff;
 }
 
 .card a {
@@ -308,6 +392,17 @@ footer {
     margin-top: auto;
 }
 
+footer a {
+    color: inherit;
+    text-decoration: underline;
+    font-weight: bold;
+    transition: opacity 0.2s;
+}
+
+footer a:hover {
+    opacity: 0.8;
+}
+
 #barra-admin {
     background: #1b3b2b;
     padding: 12px; 
@@ -320,11 +415,17 @@ footer {
 }
 
 #barra-admin input {
-     padding: 6px; 
-     border-radius: 4px; 
-     border: none; 
-     outline: none; 
-     margin-right: 5px; 
+    padding: 6px 10px; 
+    border-radius: 4px; 
+    border: 1px solid #333; 
+    outline: none; 
+    margin-right: 5px; 
+    background: #2a352f;
+    color: white;
+}
+
+#barra-admin input:focus {
+    border-color: #a3e4d7;
 }
 
 #barra-admin button { 
@@ -333,6 +434,11 @@ footer {
     font-weight: bold; 
     cursor: pointer; 
     border: none; 
+    transition: opacity 0.2s;
+}
+
+#barra-admin button:hover {
+    opacity: 0.9;
 }
 
 .modal-admin { 
@@ -404,6 +510,40 @@ article.modo-admin .acoes-artigo {
         margin-left: 0;
         padding: 5px 8px;
         font-size: 14px;
+    }
+
+    /* Banner Home - Mobile */
+    .banner-home {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .banner-home h1 {
+        font-size: 30px;
+        text-align: center;
+    }
+
+    .banner-home p {
+        font-size: 16px;
+        text-align: center;
+    }
+
+    /* Banner Demais Páginas - Mobile */
+    .banner-paginas {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .banner-paginas h1 {
+        font-size: 30px;
+        text-align: center;
+    }
+
+    .banner-paginas p {
+        font-size: 16px;
+        text-align: center;
     }
 
     .banner {

@@ -9,6 +9,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabaseClient.js"></script>
+    <script src="../js/utils.js"></script>
     <style>
         .container {
             display: grid !important;
@@ -57,6 +58,19 @@
 
 <body>
 
+<div id="barra-admin">
+    <span id="status-admin" style="color: #a3e4d7; font-weight: bold; margin-right: 15px;">🔒 Modo Visitante</span>
+    <div id="bloco-login" style="display: inline-block;">
+        <input type="email" id="email-prof" placeholder="E-mail do Professor" style="width: 180px;">
+        <input type="password" id="senha-prof" placeholder="Senha" style="width: 140px;">
+        <button onclick="entrarAdmin()" style="background: #00b4d8; color: white;">Entrar</button>
+    </div>
+    <div id="botoes-admin" style="display: none;">
+        <button onclick="abrirPainelAdicionar()" style="background: #28a745; color: white;">➕ Adicionar Vídeo</button>
+        <button onclick="sairAdmin()" style="background: #dc3545; color: white; margin-left: 5px;">Sair</button>
+    </div>
+</div>
+
 <header>
     <div class="logo">
         <a href="../index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px; color: inherit;">
@@ -75,7 +89,7 @@
     </nav>
 </header>
 
-<section class="banner">
+<section class="banner-paginas">
     <div>
         <h1>🎥 Vídeos de Química</h1>
         <p>Aulas e explicações para aprender Química de forma visual.</p>
@@ -84,7 +98,7 @@
 
 <section>
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
-        <h2 style="margin: 0;">Catálogo de Videoaulas</h2>
+        <h2 style="margin: 0; color: white;">Catálogo de Videoaulas</h2>
         <div style="display: flex; gap: 10px;">
             <button onclick="abrirPainelAdicionar()" id="btn-novo-vid" style="background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; display: none;">➕ Novo Vídeo</button>
             <button onclick="alternarPainelAdmin()" id="btn-painel-toggle" style="background: #7c3aed; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">🔐 Painel do Professor</button>
@@ -115,7 +129,7 @@
 <div id="container-categorias-videos"></div>
 
 <footer>
-    <p>© 2026 - Química com Professor Wendel</p>
+    <p>© 2026 - <a href="https://github.com/gustavohenrimerry" target="_blank" rel="noopener noreferrer">Desenvolvido por Gustavo</a></p>
 </footer>
 
 <script>
@@ -160,15 +174,6 @@
         }
     }
 
-    async function verificarSeProfessor() {
-        try {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            return !!session;
-        } catch (e) {
-            return false;
-        }
-    }
-
     async function verificarEstadoProfessorInicial() {
         if (await verificarSeProfessor()) {
             document.getElementById('btn-painel-toggle').style.background = '#16a34a';
@@ -183,29 +188,17 @@
         let painel = document.getElementById('painel-admin');
         
         if (!(await verificarSeProfessor())) {
-            let email = prompt("E-mail de acesso do professor:");
-            if (!email) return;
-            let senha = prompt("Senha de acesso:");
-            if (!senha) return;
-
-            let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
-            if (error) {
-                alert("Erro ao entrar: " + error.message);
-                return;
-            }
-
-            document.getElementById('btn-painel-toggle').style.background = '#16a34a';
-            document.getElementById('btn-painel-toggle').innerText = '🔓 Painel do Professor (Ativo)';
-            document.getElementById('btn-novo-vid').style.display = 'block';
-            carregarVideos();
+            const logou = await loginViaPainel();
+            if (!logou) return;
         }
 
         painel.style.display = painel.style.display === "none" ? "block" : "none";
     }
 
     async function abrirPainelAdicionar() {
-        if (!verificarSeProfessor()) {
-            if (!(await pedirSenhaOuLiberar())) return;
+        if (!(await verificarSeProfessor())) {
+            const logou = await loginViaPainel();
+            if (!logou) return;
         }
         let painel = document.getElementById('painel-admin');
         painel.style.display = "block";
@@ -213,50 +206,7 @@
     }
 
     async function sairModoProfessor() {
-        await supabaseClient.auth.signOut();
-        document.getElementById('painel-admin').style.display = 'none';
-        document.getElementById('btn-painel-toggle').style.background = '#7c3aed';
-        document.getElementById('btn-painel-toggle').innerText = '🔐 Painel do Professor';
-        document.getElementById('btn-novo-vid').style.display = 'none';
-        carregarVideos();
-    }
-
-    async function pedirSenhaOuLiberar() {
-        if (await verificarSeProfessor()) return true;
-
-        let email = prompt("E-mail de acesso do professor:");
-        if (!email) return false;
-        let senha = prompt("Senha de acesso:");
-        if (!senha) return false;
-
-        let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
-        if (error) {
-            alert("Senha ou e-mail incorretos!");
-            return false;
-        }
-
-        document.getElementById('btn-painel-toggle').style.background = '#16a34a';
-        document.getElementById('btn-painel-toggle').innerText = '🔓 Painel do Professor (Ativo)';
-        document.getElementById('btn-novo-vid').style.display = 'block';
-        carregarVideos();
-        return true;
-    }
-
-    function converterParaEmbed(url) {
-        if (!url) return "";
-        if (url.includes('/embed/')) return url;
-
-        let videoId = "";
-        if (url.includes('youtu.be/')) {
-            videoId = url.split('youtu.be/')[1]?.split('?')[0];
-        } else if (url.includes('watch?v=')) {
-            videoId = url.split('watch?v=')[1]?.split('&')[0];
-        }
-
-        if (videoId) {
-            return "https://www.youtube.com/embed/" + videoId;
-        }
-        return url;
+        await logoutProfessor();
     }
 
     async function obterVideos() {
@@ -294,6 +244,7 @@
             let tituloSecao = document.createElement('h2');
             tituloSecao.innerText = catNome;
             tituloSecao.style.marginBottom = "10px";
+            tituloSecao.style.color = "white";
             secao.appendChild(tituloSecao);
 
             let gridDiv = document.createElement('div');
@@ -383,7 +334,10 @@
     }
 
     async function excluirVideo(idVid) {
-        if (!(await pedirSenhaOuLiberar())) return;
+        if (!(await verificarSeProfessor())) {
+            const logou = await loginViaPainel();
+            if (!logou) return;
+        }
 
         if (confirm("Tem certeza que deseja apagar este vídeo?")) {
             await supabaseClient.from('videos').delete().eq('id', idVid);
@@ -392,7 +346,10 @@
     }
 
     async function editarVideo(idVid) {
-        if (!(await pedirSenhaOuLiberar())) return;
+        if (!(await verificarSeProfessor())) {
+            const logou = await loginViaPainel();
+            if (!logou) return;
+        }
 
         let { data } = await supabaseClient.from('videos').select('*').eq('id', idVid);
         let vid = data ? data[0] : null;
@@ -463,14 +420,7 @@
         }
     }
 
-    function verificarEnter(event, idAutorElem, idInputElem, idVid) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            comentar(idAutorElem, idInputElem, idVid);
-        }
-    }
-
-    async function editarComentario(dbId, idVid) {
+    async function editarComentario(idVid, dbId) {
         let novoTexto = prompt("Edite seu comentário:");
         if (novoTexto !== null && novoTexto.trim() !== "") {
             await supabaseClient.from('comentarios_videos').update({ texto: novoTexto.trim() }).eq('id', dbId);
@@ -478,9 +428,9 @@
         }
     }
 
-    async function excluirComentario(dbId, idVid) {
+    async function excluirComentario(idVid, dbId) {
         if (!(await verificarSeProfessor())) {
-            alert("Apenas o Professor pode apagar comentários. Ative o Painel do Professor primeiro!");
+            alert("Apenas o Professor pode apagar comentários.");
             return;
         }
 
@@ -510,104 +460,6 @@
 
     function recarregarListaComentarios(idVid) {
         carregarComentariosDoCard(idVid);
-    }
-
-    function calcularTempoRelativo(timestamp) {
-        let agora = new Date().getTime();
-        let diferencaSegundos = Math.floor((agora - timestamp) / 1000);
-
-        if (diferencaSegundos < 60) return "agora mesmo";
-        let diferencaMinutos = Math.floor(diferencaSegundos / 60);
-        if (diferencaMinutos < 60) return "há " + diferencaMinutos + (diferencaMinutos === 1 ? " minuto" : " minutos");
-        let diferencaHoras = Math.floor(diferencaMinutos / 60);
-        if (diferencaHoras < 24) return "há " + diferencaHoras + (diferencaHoras === 1 ? " hora" : " horas");
-        let diferencaDias = Math.floor(diferencaHoras / 24);
-        return "há " + diferencaDias + (diferencaDias === 1 ? " dia" : " dias");
-    }
-
-    async function adicionarElementoComentario(lista, autor, texto, tempo, idVid, dbId) {
-        let eProfessor = await verificarSeProfessor();
-
-        let novoComentario = document.createElement("div");
-        novoComentario.style.background = "#2a2a2a";
-        novoComentario.style.borderLeft = "4px solid #16a34a";
-        novoComentario.style.padding = "6px 8px";
-        novoComentario.style.borderRadius = "4px";
-        novoComentario.style.marginTop = "4px";
-        novoComentario.style.fontSize = "13px";
-
-        let cabecalho = document.createElement("div");
-        cabecalho.style.display = "flex";
-        cabecalho.style.justifyContent = "space-between";
-        cabecalho.style.marginBottom = "2px";
-
-        let autorSpan = document.createElement("span");
-        autorSpan.innerText = "👤 " + autor;
-        autorSpan.style.fontWeight = "bold";
-        autorSpan.style.color = "#4ade80";
-
-        let horaSpan = document.createElement("span");
-        horaSpan.innerText = tempo;
-        horaSpan.style.fontSize = "10px";
-        horaSpan.style.color = "#aaa";
-
-        cabecalho.appendChild(autorSpan);
-        cabecalho.appendChild(horaSpan);
-
-        let corpo = document.createElement("div");
-        corpo.style.display = "flex";
-        corpo.style.justifyContent = "space-between";
-        corpo.style.alignItems = "center";
-
-        let textoSpan = document.createElement("span");
-        textoSpan.innerText = texto;
-        textoSpan.style.wordBreak = "break-word";
-        textoSpan.style.marginRight = "8px";
-        textoSpan.style.color = "#fff";
-
-        let acoesDiv = document.createElement("div");
-        acoesDiv.style.display = "flex";
-        acoesDiv.style.gap = "4px";
-        acoesDiv.style.whiteSpace = "nowrap";
-
-        let btnEditar = document.createElement("button");
-        btnEditar.innerText = "✏️";
-        btnEditar.style.background = "#374151";
-        btnEditar.style.color = "white";
-        btnEditar.style.border = "none";
-        btnEditar.style.padding = "2px 5px";
-        btnEditar.style.borderRadius = "3px";
-        btnEditar.style.cursor = "pointer";
-        btnEditar.style.fontSize = "10px";
-        btnEditar.title = "Editar comentário";
-        btnEditar.onclick = function() {
-            editarComentario(dbId, idVid);
-        };
-        acoesDiv.appendChild(btnEditar);
-
-        if (eProfessor) {
-            let btnExcluir = document.createElement("button");
-            btnExcluir.innerText = "🗑️";
-            btnExcluir.style.background = "#b91c1c";
-            btnExcluir.style.color = "white";
-            btnExcluir.style.border = "none";
-            btnExcluir.style.padding = "2px 5px";
-            btnExcluir.style.borderRadius = "3px";
-            btnExcluir.style.cursor = "pointer";
-            btnExcluir.style.fontSize = "10px";
-            btnExcluir.title = "Apagar comentário (Modo Professor)";
-            btnExcluir.onclick = function() {
-                excluirComentario(dbId, idVid);
-            };
-            acoesDiv.appendChild(btnExcluir);
-        }
-
-        corpo.appendChild(textoSpan);
-        corpo.appendChild(acoesDiv);
-
-        novoComentario.appendChild(cabecalho);
-        novoComentario.appendChild(corpo);
-        lista.appendChild(novoComentario);
     }
 </script>
 
