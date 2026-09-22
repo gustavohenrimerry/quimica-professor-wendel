@@ -1,379 +1,375 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz de Química - Professor Wendel</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="quiz.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module"src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-    <script src="../js/supabaseClient.js"></script>
-    <style>
-        body {
-            position: relative;
-        }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Quiz de Química - Professor Wendel</title>
+        <link rel="stylesheet" href="../css/style.css" />
+        <link rel="stylesheet" href="quiz.css" />
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script
+            type="module"
+            src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
+        ></script>
+        <script src="../js/supabaseClient.js"></script>
+        <style>
+            body {
+                position: relative;
+            }
 
-        .molecula-lateral {
-            display: center;
-            top: 100px;
-            left: 20px;
-            height: 200px;
-            z-index: 5;
-            background: transparent;
-            pointer-events: auto;
-        }
+            .molecula-lateral {
+                display: center;
+                top: 100px;
+                left: 20px;
+                height: 200px;
+                z-index: 5;
+                background: transparent;
+                pointer-events: auto;
+            }
 
-        .quiz-container {
-            max-width: 750px !important;
-            width: 95% !important;
-            margin: 40px auto !important;
-        }
+            .quiz-container {
+                max-width: 750px !important;
+                width: 95% !important;
+                margin: 40px auto !important;
+            }
 
-        .quiz-card {
-            max-width: 100% !important;
-            width: 100% !important;
-            padding: 35px !important;
-            box-sizing: border-box;
-            background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
+            .quiz-card {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 35px !important;
+                box-sizing: border-box;
+                background: #ffffff;
+                border-radius: 15px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            }
 
-        .series-botoes {
-            display: flex !important;
-            flex-wrap: wrap !important;
-            gap: 10px !important;
-            justify-content: center !important;
-            margin-top: 20px !important;
-        }
+            .series-botoes {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 10px !important;
+                justify-content: center !important;
+                margin-top: 20px !important;
+            }
 
-        .btn-serie {
-            cursor: pointer !important;
-        }
+            .btn-serie {
+                cursor: pointer !important;
+            }
 
-        .painel-professor-global {
-            display: none !important;
-            background: #ffffff;
-            border: 2px dashed #0f4c2c;
-            padding: 35px;
-            margin: 40px auto;
-            width: 95% !important;
-            max-width: 1250px !important;
-            border-radius: 15px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
-            box-sizing: border-box;
-        }
+            .painel-professor-global {
+                display: none !important;
+                background: #ffffff;
+                border: 2px dashed #0f4c2c;
+                padding: 35px;
+                margin: 40px auto;
+                width: 95% !important;
+                max-width: 1250px !important;
+                border-radius: 15px;
+                box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+                box-sizing: border-box;
+            }
 
-        body.modo-professor-ativo .painel-professor-global {
-            display: block !important;
-        }
+            body.modo-professor-ativo .painel-professor-global {
+                display: block !important;
+            }
 
-        .bloco-serie-prof {
-            background: #f4f9f5;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            border-left: 6px solid #0f4c2c;
-        }
+            .bloco-serie-prof {
+                background: #f4f9f5;
+                padding: 20px;
+                margin-bottom: 20px;
+                border-radius: 10px;
+                border-left: 6px solid #0f4c2c;
+            }
 
-        .bloco-conteudo-serie {
-            margin-top: 15px;
-        }
+            .bloco-conteudo-serie {
+                margin-top: 15px;
+            }
 
-        .bloco-conteudo-serie.fechado {
-            display: none;
-        }
+            .bloco-conteudo-serie.fechado {
+                display: none;
+            }
 
-        .comentario-quiz {
-            background: #f8fbff;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #d8e8ff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-        }
-    </style>
-</head>
+            .comentario-quiz {
+                background: #f8fbff;
+                padding: 20px;
+                border-radius: 12px;
+                border: 1px solid #d8e8ff;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            }
+        </style>
+    </head>
 
-<body>
+    <body>
+        <header>
+            <div class="logo">
+                <a
+                    href="../index.html"
+                    style="
+                        text-decoration: none;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        color: inherit;
+                    "
+                >
+                    <img
+                        src="../assets/imagens/logo/logo.png"
+                        alt="Logo Química com Professor Wendel"
+                    />
 
-<header>
-    <div class="logo">
-        <a href="../index.html"
-           style="text-decoration:none;display:flex;align-items:center;gap:10px;color:inherit;">
+                    <span>Química com Professor Wendel</span>
+                </a>
+            </div>
 
-            <img src="../assets/imagens/logo/logo.png"
-                 alt="Logo Química com Professor Wendel">
+            <nav>
+                <a href="../index.html">Início</a>
+                <a href="../paginas/experimentos.html">Experimentos</a>
+                <a href="../paginas/videos.html">Vídeos</a>
+                <a href="../paginas/perguntas.html">Perguntas</a>
+                <a href="../paginas/professor.html">Professor</a>
+                <a href="../sugestoes.html">Sugestões</a>
 
-            <span>Química com Professor Wendel</span>
-        </a>
-    </div>
+                <a
+                    href="#"
+                    id="btn-painel-global"
+                    onclick="toggleModoProfessorGlobal()"
+                    style="color: #ffeb3b; font-weight: bold"
+                >
+                    🔑 Painel do Professor
+                </a>
+            </nav>
+        </header>
 
-    <nav>
-        <a href="../index.html">Início</a>
-        <a href="../paginas/experimentos.html">Experimentos</a>
-        <a href="../paginas/videos.html">Vídeos</a>
-        <a href="../paginas/perguntas.html">Perguntas</a>
-        <a href="../paginas/professor.html">Professor</a>
-        <a href="../sugestoes.html">Sugestões</a>
-
-        <a href="#"
-           id="btn-painel-global"
-           onclick="toggleModoProfessorGlobal()"
-           style="color:#ffeb3b;font-weight:bold;">
-            🔑 Painel do Professor
-        </a>
-    </nav>
-</header>
-
-
-<div class="molecula-lateral">
-
-    <model-viewer
-        id="modelo-molecula"
-        src="molecule.glb"
-        alt="Molécula 3D"
-        camera-controls
-        disable-zoom
-        field-of-view="22deg"
-        camera-orbit="50deg 90deg 90%"
-        orientation="15deg 25deg 10deg"
-        style="width:100%;height:100%;background:transparent;">
-    </model-viewer>
-
-</div>
-
-
-<main class="quiz-container">
-
-    <div id="tela-inicio" class="quiz-card">
-
-        <h2>🧠 Desafio de Química</h2>
-
-        <p>
-            Escolha a sua série para começar o quiz:
-        </p>
-
-        <div class="series-botoes">
-
-            <button class="btn-serie" data-serie="6ano">
-                6º Ano
-            </button>
-
-            <button class="btn-serie" data-serie="7ano">
-                7º Ano
-            </button>
-
-            <button class="btn-serie" data-serie="8ano">
-                8º Ano
-            </button>
-
-            <button class="btn-serie" data-serie="9ano">
-                9º Ano
-            </button>
-
-            <button class="btn-serie" data-serie="1serie">
-                1ª Série
-            </button>
-
-            <button class="btn-serie" data-serie="2serie">
-                2ª Série
-            </button>
-
-            <button class="btn-serie" data-serie="3serie">
-                3ª Série
-            </button>
-
-        </div>
-    </div>
-
-
-    <div id="tela-quiz" class="quiz-card oculto">
-
-        <div class="quiz-info">
-            <span id="contador-pergunta">
-                Pergunta 1 de X
-            </span>
+        <div class="molecula-lateral">
+            <model-viewer
+                id="modelo-molecula"
+                src="molecule.glb"
+                alt="Molécula 3D"
+                camera-controls
+                disable-zoom
+                field-of-view="22deg"
+                camera-orbit="50deg 90deg 90%"
+                orientation="15deg 25deg 10deg"
+                style="width: 100%; height: 100%; background: transparent"
+            ></model-viewer>
         </div>
 
-        <h3 id="pergunta-texto">
-            Texto da pergunta aqui
-        </h3>
+        <main class="quiz-container">
+            <div id="tela-inicio" class="quiz-card">
+                <h2>🧠 Desafio de Química</h2>
 
-        <div id="alternativas-container"
-             class="alternativas-grid">
+                <p>Escolha a sua série para começar o quiz:</p>
+
+                <div class="series-botoes">
+                    <button class="btn-serie" data-serie="6ano">6º Ano</button>
+
+                    <button class="btn-serie" data-serie="7ano">7º Ano</button>
+
+                    <button class="btn-serie" data-serie="8ano">8º Ano</button>
+
+                    <button class="btn-serie" data-serie="9ano">9º Ano</button>
+
+                    <button class="btn-serie" data-serie="1serie">1ª Série</button>
+
+                    <button class="btn-serie" data-serie="2serie">2ª Série</button>
+
+                    <button class="btn-serie" data-serie="3serie">3ª Série</button>
+                </div>
+            </div>
+
+            <div id="tela-quiz" class="quiz-card oculto">
+                <div class="quiz-info">
+                    <span id="contador-pergunta">Pergunta 1 de X</span>
+                </div>
+
+                <h3 id="pergunta-texto">Texto da pergunta aqui</h3>
+
+                <div id="alternativas-container" class="alternativas-grid"></div>
+
+                <div id="explicacao-container" class="explicacao-box oculto">
+                    <p id="explicacao-texto"></p>
+                </div>
+
+                <button id="btn-proximo" class="botao oculto">Próxima Pergunta</button>
+            </div>
+
+            <div id="tela-resultado" class="quiz-card oculto">
+                <h2>🏆 Fim do Quiz!</h2>
+
+                <p id="resultado-texto">Você acertou X de Y perguntas.</p>
+
+                <button id="btn-reiniciar" class="botao">Tentar Novamente</button>
+
+                <br />
+                <br />
+
+                <a
+                    href="../index.html"
+                    class="btn-secundario"
+                    style="text-decoration: none; padding: 10px 20px"
+                >
+                    Voltar ao Início
+                </a>
+            </div>
+        </main>
+
+        <div id="painel-gerenciamento" class="painel-professor-global">
+            <h2 style="color: #0f4c2c; margin-bottom: 10px; font-size: 28px">
+                🛠️ Painel Geral de Perguntas
+            </h2>
+
+            <p style="margin-bottom: 25px; color: #555; font-size: 16px">
+                Gerencie perguntas, respostas e explicações de todas as séries do site diretamente
+                pelo Supabase.
+            </p>
+
+            <div id="blocos-series-container"></div>
         </div>
 
-        <div id="explicacao-container"
-             class="explicacao-box oculto">
+        <section
+            class="comentarios-section"
+            style="
+                max-width: 650px;
+                margin: 0 auto 60px auto;
+                padding: 35px;
+                background: #ffffff;
+                border-radius: 20px;
+                box-shadow: 0 10px 30px rgba(11, 61, 145, 0.12);
+                border: 1px solid #e2edff;
+            "
+        >
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px">
+                <span style="font-size: 26px">💬</span>
 
-            <p id="explicacao-texto"></p>
+                <h3 style="color: #0b3d91; margin: 0; font-size: 22px">
+                    Mural de Opiniões e Acertos
+                </h3>
+            </div>
 
-        </div>
+            <p style="color: #555; font-size: 15px; margin-bottom: 25px; line-height: 1.5">
+                O que você achou do desafio? Conte quantos acertos fez e deixe sua marca no mural!
+            </p>
 
-        <button id="btn-proximo"
-                class="botao oculto">
-            Próxima Pergunta
-        </button>
+            <form id="form-comentario" style="display: flex; flex-direction: column; gap: 15px">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap">
+                    <input
+                        type="text"
+                        id="nome-usuario"
+                        placeholder="Seu nome completo"
+                        required
+                        style="
+                            flex: 1;
+                            min-width: 200px;
+                            padding: 14px;
+                            border: 2px solid #d0e1fd;
+                            border-radius: 10px;
+                            font-size: 15px;
+                            outline: none;
+                        "
+                    />
 
-    </div>
+                    <input
+                        type="text"
+                        id="serie-usuario"
+                        placeholder="Sua série (ex: 8º Ano)"
+                        required
+                        style="
+                            width: 150px;
+                            padding: 14px;
+                            border: 2px solid #d0e1fd;
+                            border-radius: 10px;
+                            font-size: 15px;
+                            outline: none;
+                        "
+                    />
+                </div>
 
+                <textarea
+                    id="texto-comentario"
+                    placeholder="Escreva sua opinião e seus acertos..."
+                    rows="3"
+                    required
+                    style="
+                        padding: 14px;
+                        border: 2px solid #d0e1fd;
+                        border-radius: 10px;
+                        font-size: 15px;
+                        resize: vertical;
+                        outline: none;
+                    "
+                ></textarea>
 
-    <div id="tela-resultado"
-         class="quiz-card oculto">
+                <button
+                    type="submit"
+                    style="
+                        background: linear-gradient(135deg, #0b3d91, #00b4d8);
+                        color: white;
+                        border: none;
+                        padding: 14px;
+                        border-radius: 10px;
+                        font-size: 16px;
+                        font-weight: bold;
+                        cursor: pointer;
+                    "
+                >
+                    Publicar no Mural
+                </button>
+            </form>
 
-        <h2>🏆 Fim do Quiz!</h2>
+            <div
+                id="lista-comentarios"
+                style="
+                    margin-top: 35px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 15px;
+                    text-align: left;
+                "
+            ></div>
+        </section>
 
-        <p id="resultado-texto">
-            Você acertou X de Y perguntas.
-        </p>
+        <footer>
+            <p>
+                © 2026 -
+                <a
+                    href="https://github.com/gustavohenrimerry"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Desenvolvido por Gustavo
+                </a>
+            </p>
+        </footer>
 
-        <button id="btn-reiniciar"
-                class="botao">
-            Tentar Novamente
-        </button>
+        <script src="quiz.js"></script>
 
-        <br><br>
+        <script>
+            const seriesNomes = {
+                "6ano": "6º Ano",
+                "7ano": "7º Ano",
+                "8ano": "8º Ano",
+                "9ano": "9º Ano",
+                "1serie": "1ª Série",
+                "2serie": "2ª Série",
+                "3serie": "3ª Série",
+            };
 
-        <a href="../index.html"
-           class="btn-secundario"
-           style="text-decoration:none;padding:10px 20px;">
-            Voltar ao Início
-        </a>
-
-    </div>
-
-</main>
-
-
-<div id="painel-gerenciamento"
-     class="painel-professor-global">
-
-    <h2 style="color:#0f4c2c;margin-bottom:10px;font-size:28px;">
-        🛠️ Painel Geral de Perguntas
-    </h2>
-
-    <p style="margin-bottom:25px;color:#555;font-size:16px;">
-        Gerencie perguntas, respostas e explicações de todas as séries do site diretamente pelo Supabase.
-    </p>
-
-    <div id="blocos-series-container"></div>
-
-</div>
-
-
-<section class="comentarios-section"
-         style="max-width:650px;margin:0 auto 60px auto;padding:35px;background:#ffffff;border-radius:20px;box-shadow:0 10px 30px rgba(11,61,145,0.12);border:1px solid #e2edff;">
-
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
-
-        <span style="font-size:26px;">
-            💬
-        </span>
-
-        <h3 style="color:#0b3d91;margin:0;font-size:22px;">
-            Mural de Opiniões e Acertos
-        </h3>
-
-    </div>
-
-    <p style="color:#555;font-size:15px;margin-bottom:25px;line-height:1.5;">
-        O que você achou do desafio?
-        Conte quantos acertos fez e deixe sua marca no mural!
-    </p>
-
-
-    <form id="form-comentario"
-          style="display:flex;flex-direction:column;gap:15px;">
-
-        <div style="display:flex;gap:15px;flex-wrap:wrap;">
-
-            <input
-                type="text"
-                id="nome-usuario"
-                placeholder="Seu nome completo"
-                required
-                style="flex:1;min-width:200px;padding:14px;border:2px solid #d0e1fd;border-radius:10px;font-size:15px;outline:none;">
-
-            <input
-                type="text"
-                id="serie-usuario"
-                placeholder="Sua série (ex: 8º Ano)"
-                required
-                style="width:150px;padding:14px;border:2px solid #d0e1fd;border-radius:10px;font-size:15px;outline:none;">
-
-        </div>
-
-
-        <textarea
-            id="texto-comentario"
-            placeholder="Escreva sua opinião e seus acertos..."
-            rows="3"
-            required
-            style="padding:14px;border:2px solid #d0e1fd;border-radius:10px;font-size:15px;resize:vertical;outline:none;">
-        </textarea>
-
-
-        <button
-            type="submit"
-            style="background:linear-gradient(135deg,#0b3d91,#00b4d8);color:white;border:none;padding:14px;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer;">
-            Publicar no Mural
-        </button>
-
-    </form>
-
-
-    <div id="lista-comentarios"
-         style="margin-top:35px;display:flex;flex-direction:column;gap:15px;text-align:left;">
-    </div>
-
-</section>
-
-
-<footer>
-    <p>© 2026 - <a href="https://github.com/gustavohenrimerry" target="_blank" rel="noopener noreferrer">Desenvolvido por Gustavo</a></p>
-</footer>
-
-
-<script src="quiz.js"></script>
-
-
-<script>
-
-const seriesNomes = {
-
-    "6ano": "6º Ano",
-    "7ano": "7º Ano",
-    "8ano": "8º Ano",
-    "9ano": "9º Ano",
-    "1serie": "1ª Série",
-    "2serie": "2ª Série",
-    "3serie": "3ª Série"
-
-};
-
-
-/* =========================================================
+            /* =========================================================
    PAINEL DO PROFESSOR
 ========================================================= */
 
-async function montarBlocosProfessor() {
+            async function montarBlocosProfessor() {
+                const container = document.getElementById("blocos-series-container");
 
-    const container =
-        document.getElementById("blocos-series-container");
+                container.innerHTML = "";
 
-    container.innerHTML = "";
+                for (const [serieKey, serieNome] of Object.entries(seriesNomes)) {
+                    const div = document.createElement("div");
 
-    for (const [serieKey, serieNome]
-        of Object.entries(seriesNomes)) {
+                    div.className = "bloco-serie-prof";
 
-        const div = document.createElement("div");
+                    div.setAttribute("data-serie-id", serieKey);
 
-        div.className = "bloco-serie-prof";
-
-        div.setAttribute("data-serie-id", serieKey);
-
-        div.innerHTML = `
+                    div.innerHTML = `
 
             <div style="display:flex;justify-content:space-between;align-items:center;">
 
@@ -406,173 +402,116 @@ async function montarBlocosProfessor() {
             </div>
         `;
 
-        container.appendChild(div);
-    }
-}
+                    container.appendChild(div);
+                }
+            }
 
+            async function toggleModoProfessorGlobal() {
+                const body = document.body;
 
-async function toggleModoProfessorGlobal() {
+                const btn = document.getElementById("btn-painel-global");
 
-    const body = document.body;
+                const {
+                    data: { session },
+                } = await window.meuClienteSupabase.auth.getSession();
 
-    const btn =
-        document.getElementById("btn-painel-global");
+                if (!session) {
+                    alert(
+                        "Faça login como professor pelo sistema de Login antes de acessar o painel.",
+                    );
 
-    const { data: { session } } =
-        await window.meuClienteSupabase.auth.getSession();
+                    window.location.href = "../login.html";
 
+                    return;
+                }
 
-    if (!session) {
+                if (!body.classList.contains("modo-professor-ativo")) {
+                    body.classList.add("modo-professor-ativo");
 
-        alert(
-            "Faça login como professor pelo sistema de Login antes de acessar o painel."
-        );
+                    btn.innerText = "🔑 Painel do Professor (Ativo)";
 
-        window.location.href = "../login.html";
+                    btn.style.color = "#4CAF50";
 
-        return;
-    }
+                    await montarBlocosProfessor();
 
+                    await carregarDadosPainelProfessor();
+                } else {
+                    body.classList.remove("modo-professor-ativo");
 
-    if (!body.classList.contains("modo-professor-ativo")) {
+                    btn.innerText = "🔑 Painel do Professor";
 
-        body.classList.add("modo-professor-ativo");
+                    btn.style.color = "#ffeb3b";
+                }
+            }
 
-        btn.innerText =
-            "🔑 Painel do Professor (Ativo)";
+            function alternarBlocoSerie(serie) {
+                const blocoSerie = document.querySelector(
+                    `[data-serie-id="${serie}"] .bloco-conteudo-serie`,
+                );
 
-        btn.style.color =
-            "#4CAF50";
+                const btnToggle = document.getElementById(`btn-toggle-${serie}`);
 
-        await montarBlocosProfessor();
+                if (blocoSerie.classList.contains("fechado")) {
+                    blocoSerie.classList.remove("fechado");
 
-        await carregarDadosPainelProfessor();
+                    btnToggle.innerText = "📂 Fechar";
 
-    } else {
+                    btnToggle.style.background = "#6c757d";
+                } else {
+                    blocoSerie.classList.add("fechado");
 
-        body.classList.remove("modo-professor-ativo");
+                    btnToggle.innerText = "📁 Abrir";
 
-        btn.innerText =
-            "🔑 Painel do Professor";
+                    btnToggle.style.background = "#0f4c2c";
+                }
+            }
 
-        btn.style.color =
-            "#ffeb3b";
+            async function carregarDadosPainelProfessor() {
+                try {
+                    const { data, error } = await window.meuClienteSupabase
+                        .from("perguntas")
+                        .select("*");
 
-    }
-}
+                    window.dadosAdminMemoria = {};
 
+                    if (!error && data) {
+                        data.forEach((row) => {
+                            window.dadosAdminMemoria[row.serie] = row.dados || [];
+                        });
+                    }
+                } catch (e) {
+                    console.error(e);
 
-function alternarBlocoSerie(serie) {
+                    window.dadosAdminMemoria = {};
+                }
 
-    const blocoSerie =
-        document.querySelector(
-            `[data-serie-id="${serie}"] .bloco-conteudo-serie`
-        );
+                renderizarPainelVisualmente();
+            }
 
-    const btnToggle =
-        document.getElementById(`btn-toggle-${serie}`);
+            function renderizarPainelVisualmente() {
+                const series = Object.keys(seriesNomes);
 
+                series.forEach((serie) => {
+                    const bloco = document.querySelector(
+                        `[data-serie-id="${serie}"] .lista-perguntas-serie`,
+                    );
 
-    if (blocoSerie.classList.contains("fechado")) {
+                    if (!bloco) return;
 
-        blocoSerie.classList.remove("fechado");
+                    bloco.innerHTML = "";
 
-        btnToggle.innerText =
-            "📂 Fechar";
+                    const perguntasDaSerie = window.dadosAdminMemoria[serie] || [];
 
-        btnToggle.style.background =
-            "#6c757d";
+                    perguntasDaSerie.forEach((item, index) => {
+                        const altCorretaTexto =
+                            item.alternativas[item.resposta] || item.alternativas[0];
 
-    } else {
+                        const divItem = document.createElement("div");
 
-        blocoSerie.classList.add("fechado");
+                        divItem.style.cssText =
+                            "background:#fff;padding:15px;margin:10px 0;border-radius:8px;border:1px solid #ddd;font-size:15px;";
 
-        btnToggle.innerText =
-            "📁 Abrir";
-
-        btnToggle.style.background =
-            "#0f4c2c";
-
-    }
-}
-
-
-async function carregarDadosPainelProfessor() {
-
-    try {
-
-        const { data, error } =
-            await window.meuClienteSupabase
-                .from("perguntas")
-                .select("*");
-
-
-        window.dadosAdminMemoria = {};
-
-
-        if (!error && data) {
-
-            data.forEach(row => {
-
-                window.dadosAdminMemoria[row.serie] =
-                    row.dados || [];
-
-            });
-
-        }
-
-    } catch (e) {
-
-        console.error(e);
-
-        window.dadosAdminMemoria = {};
-
-    }
-
-    renderizarPainelVisualmente();
-}
-
-
-function renderizarPainelVisualmente() {
-
-    const series =
-        Object.keys(seriesNomes);
-
-
-    series.forEach(serie => {
-
-        const bloco =
-            document.querySelector(
-                `[data-serie-id="${serie}"] .lista-perguntas-serie`
-            );
-
-
-        if (!bloco) return;
-
-
-        bloco.innerHTML = "";
-
-
-        const perguntasDaSerie =
-            window.dadosAdminMemoria[serie] || [];
-
-
-        perguntasDaSerie.forEach((item, index) => {
-
-            const altCorretaTexto =
-                item.alternativas[item.resposta] ||
-                item.alternativas[0];
-
-
-            const divItem =
-                document.createElement("div");
-
-
-            divItem.style.cssText =
-                "background:#fff;padding:15px;margin:10px 0;border-radius:8px;border:1px solid #ddd;font-size:15px;";
-
-
-            divItem.innerHTML = `
+                        divItem.innerHTML = `
 
                 <strong>Q${index + 1}:</strong>
                 ${item.pergunta}
@@ -607,481 +546,259 @@ function renderizarPainelVisualmente() {
 
             `;
 
-            bloco.appendChild(divItem);
+                        bloco.appendChild(divItem);
+                    });
+                });
+            }
 
-        });
+            async function salvarSerieNoSupabase(serie) {
+                const listaAtual = window.dadosAdminMemoria[serie] || [];
 
-    });
+                const { data } = await window.meuClienteSupabase
+                    .from("perguntas")
+                    .select("id")
+                    .eq("serie", serie);
 
-}
+                if (data && data.length > 0) {
+                    const { error } = await window.meuClienteSupabase
+                        .from("perguntas")
+                        .update({
+                            dados: listaAtual,
+                        })
+                        .eq("serie", serie);
 
+                    if (error) {
+                        console.error("Erro ao atualizar perguntas:", error.message);
+                        alert("Erro ao salvar perguntas: " + error.message);
+                    }
+                } else {
+                    const { error } = await window.meuClienteSupabase.from("perguntas").insert({
+                        serie: serie,
+                        dados: listaAtual,
+                    });
 
-async function salvarSerieNoSupabase(serie) {
+                    if (error) {
+                        console.error("Erro ao inserir perguntas:", error.message);
+                        alert("Erro ao salvar perguntas: " + error.message);
+                    }
+                }
+            }
 
-    const listaAtual =
-        window.dadosAdminMemoria[serie] || [];
+            async function professorAdicionarPergunta(serie) {
+                const p = prompt("Digite a nova pergunta:");
 
+                if (!p || p.trim() === "") return;
 
-    const { data } =
-        await window.meuClienteSupabase
-            .from("perguntas")
-            .select("id")
-            .eq("serie", serie);
+                const alt1 = prompt("Digite a 1ª alternativa (Opção Correta):");
 
+                const alt2 = prompt("Digite a 2ª alternativa (Incorreta):");
 
-    if (data && data.length > 0) {
+                const alt3 = prompt("Digite a 3ª alternativa (Incorreta):");
 
-        const { error } = await window.meuClienteSupabase
-            .from("perguntas")
-            .update({
-                dados: listaAtual
-            })
-            .eq("serie", serie);
+                const alt4 = prompt("Digite a 4ª alternativa (Incorreta):");
 
-        if (error) {
-            console.error("Erro ao atualizar perguntas:", error.message);
-            alert("Erro ao salvar perguntas: " + error.message);
-        }
+                if (!alt1 || !alt2 || !alt3 || !alt4) {
+                    alert("Você precisa preencher todas as 4 alternativas!");
 
-    } else {
+                    return;
+                }
 
-        const { error } = await window.meuClienteSupabase
-            .from("perguntas")
-            .insert({
-                serie: serie,
-                dados: listaAtual
-            });
+                const novaPergunta = {
+                    pergunta: p,
 
-        if (error) {
-            console.error("Erro ao inserir perguntas:", error.message);
-            alert("Erro ao salvar perguntas: " + error.message);
-        }
+                    alternativas: [alt1, alt2, alt3, alt4],
 
-    }
+                    resposta: 0,
 
-}
+                    explicacao:
+                        prompt("Digite a explicação pedagógica:") || "Sem explicação cadastrada.",
+                };
 
+                if (!window.dadosAdminMemoria[serie]) {
+                    window.dadosAdminMemoria[serie] = [];
+                }
 
-async function professorAdicionarPergunta(serie) {
+                window.dadosAdminMemoria[serie].push(novaPergunta);
 
-    const p =
-        prompt("Digite a nova pergunta:");
+                await salvarSerieNoSupabase(serie);
 
-    if (!p || p.trim() === "") return;
+                await carregarDadosPainelProfessor();
 
+                alert("Pergunta adicionada com sucesso!");
+            }
 
-    const alt1 =
-        prompt("Digite a 1ª alternativa (Opção Correta):");
+            async function professorEditarItem(serie, index) {
+                let item = window.dadosAdminMemoria[serie][index];
 
-    const alt2 =
-        prompt("Digite a 2ª alternativa (Incorreta):");
+                const novaP = prompt("Editar pergunta:", item.pergunta);
 
-    const alt3 =
-        prompt("Digite a 3ª alternativa (Incorreta):");
+                if (novaP !== null && novaP.trim() !== "") {
+                    item.pergunta = novaP;
+                }
 
-    const alt4 =
-        prompt("Digite a 4ª alternativa (Incorreta):");
+                const novaAltCorreta = prompt(
+                    "Editar a alternativa CORRETA:",
+                    item.alternativas[item.resposta],
+                );
 
+                if (novaAltCorreta !== null && novaAltCorreta.trim() !== "") {
+                    item.alternativas[item.resposta] = novaAltCorreta;
+                }
 
-    if (!alt1 || !alt2 || !alt3 || !alt4) {
+                const novaExp = prompt("Editar explicação:", item.explicacao);
 
-        alert(
-            "Você precisa preencher todas as 4 alternativas!"
-        );
+                if (novaExp !== null) {
+                    item.explicacao = novaExp;
+                }
 
-        return;
-    }
+                await salvarSerieNoSupabase(serie);
 
+                await carregarDadosPainelProfessor();
 
-    const novaPergunta = {
+                alert("Pergunta atualizada com sucesso!");
+            }
 
-        pergunta: p,
+            async function professorExcluirItem(serie, index) {
+                if (!confirm("Deseja realmente excluir esta pergunta?")) return;
 
-        alternativas: [
-            alt1,
-            alt2,
-            alt3,
-            alt4
-        ],
+                window.dadosAdminMemoria[serie].splice(index, 1);
 
-        resposta: 0,
+                await salvarSerieNoSupabase(serie);
 
-        explicacao:
-            prompt("Digite a explicação pedagógica:") ||
-            "Sem explicação cadastrada."
+                await carregarDadosPainelProfessor();
 
-    };
+                alert("Pergunta excluída!");
+            }
 
-
-    if (!window.dadosAdminMemoria[serie]) {
-
-        window.dadosAdminMemoria[serie] = [];
-
-    }
-
-
-    window.dadosAdminMemoria[serie].push(
-        novaPergunta
-    );
-
-
-    await salvarSerieNoSupabase(serie);
-
-    await carregarDadosPainelProfessor();
-
-
-    alert(
-        "Pergunta adicionada com sucesso!"
-    );
-
-}
-
-
-async function professorEditarItem(serie, index) {
-
-    let item =
-        window.dadosAdminMemoria[serie][index];
-
-
-    const novaP =
-        prompt(
-            "Editar pergunta:",
-            item.pergunta
-        );
-
-
-    if (
-        novaP !== null &&
-        novaP.trim() !== ""
-    ) {
-
-        item.pergunta =
-            novaP;
-
-    }
-
-
-    const novaAltCorreta =
-        prompt(
-            "Editar a alternativa CORRETA:",
-            item.alternativas[item.resposta]
-        );
-
-
-    if (
-        novaAltCorreta !== null &&
-        novaAltCorreta.trim() !== ""
-    ) {
-
-        item.alternativas[item.resposta] =
-            novaAltCorreta;
-
-    }
-
-
-    const novaExp =
-        prompt(
-            "Editar explicação:",
-            item.explicacao
-        );
-
-
-    if (novaExp !== null) {
-
-        item.explicacao =
-            novaExp;
-
-    }
-
-
-    await salvarSerieNoSupabase(serie);
-
-    await carregarDadosPainelProfessor();
-
-
-    alert(
-        "Pergunta atualizada com sucesso!"
-    );
-
-}
-
-
-async function professorExcluirItem(serie, index) {
-
-    if (
-        !confirm(
-            "Deseja realmente excluir esta pergunta?"
-        )
-    ) return;
-
-
-    window.dadosAdminMemoria[serie]
-        .splice(index, 1);
-
-
-    await salvarSerieNoSupabase(serie);
-
-    await carregarDadosPainelProfessor();
-
-
-    alert(
-        "Pergunta excluída!"
-    );
-
-}
-
-
-/* =========================================================
+            /* =========================================================
    MURAL DE COMENTÁRIOS DO QUIZ
 ========================================================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    async () => {
+            document.addEventListener("DOMContentLoaded", async () => {
+                carregarComentariosSalvos();
 
-        carregarComentariosSalvos();
+                const modelViewer = document.querySelector("#modelo-molecula");
 
+                let estaInteragindo = false;
 
-        const modelViewer =
-            document.querySelector(
-                "#modelo-molecula"
-            );
+                let angulo = 50;
 
+                if (modelViewer) {
+                    modelViewer.addEventListener("pointerdown", () => {
+                        estaInteragindo = true;
+                    });
 
-        let estaInteragindo =
-            false;
+                    modelViewer.addEventListener("pointerup", () => {
+                        estaInteragindo = false;
+                    });
 
-        let angulo = 50;
+                    modelViewer.addEventListener("touchend", () => {
+                        estaInteragindo = false;
+                    });
 
+                    function girar() {
+                        if (!estaInteragindo) {
+                            angulo -= 0.5;
 
-        if (modelViewer) {
+                            modelViewer.cameraOrbit = `${angulo}deg 90deg 90%`;
+                        }
 
-            modelViewer.addEventListener(
-                "pointerdown",
-                () => {
-                    estaInteragindo = true;
+                        requestAnimationFrame(girar);
+                    }
+
+                    girar();
                 }
-            );
-
-
-            modelViewer.addEventListener(
-                "pointerup",
-                () => {
-                    estaInteragindo = false;
-                }
-            );
-
-
-            modelViewer.addEventListener(
-                "touchend",
-                () => {
-                    estaInteragindo = false;
-                }
-            );
-
-
-            function girar() {
-
-                if (!estaInteragindo) {
-
-                    angulo -= 0.5;
-
-                    modelViewer.cameraOrbit =
-                        `${angulo}deg 90deg 90%`;
-
-                }
-
-                requestAnimationFrame(girar);
-
-            }
-
-
-            girar();
-
-        }
-
-    }
-);
-
-
-document
-    .getElementById("form-comentario")
-    .addEventListener(
-        "submit",
-        async function(e) {
-
-            e.preventDefault();
-
-
-            const nome =
-                document
-                    .getElementById("nome-usuario")
-                    .value
-                    .trim();
-
-
-            const serie =
-                document
-                    .getElementById("serie-usuario")
-                    .value
-                    .trim();
-
-
-            const texto =
-                document
-                    .getElementById("texto-comentario")
-                    .value
-                    .trim();
-
-
-            if (!nome || !serie || !texto) {
-
-                alert(
-                    "Preencha todos os campos."
-                );
-
-                return;
-
-            }
-
-
-            const autor =
-                `${nome} - ${serie}`;
-
-
-            const { data, error } =
-                await window.meuClienteSupabase
-                    .from("comentarios")
-                    .insert([{
-                        item_id: "quiz",
-                        autor: autor,
-                        texto: texto
-                    }])
-                    .select();
-
-
-            if (error) {
-
-                console.error(error);
-
-                alert(
-                    "Erro ao publicar: " +
-                    error.message
-                );
-
-                return;
-
-            }
-
-
-            if (data && data.length > 0) {
-
-                renderizarComentario(
-                    data[0]
-                );
-
-            }
-
+            });
 
             document
                 .getElementById("form-comentario")
-                .reset();
+                .addEventListener("submit", async function (e) {
+                    e.preventDefault();
 
-        }
-    );
+                    const nome = document.getElementById("nome-usuario").value.trim();
 
+                    const serie = document.getElementById("serie-usuario").value.trim();
 
-async function carregarComentariosSalvos() {
+                    const texto = document.getElementById("texto-comentario").value.trim();
 
-    const lista =
-        document.getElementById(
-            "lista-comentarios"
-        );
+                    if (!nome || !serie || !texto) {
+                        alert("Preencha todos os campos.");
 
-
-    lista.innerHTML = "";
-
-
-    try {
-
-        const { data, error } =
-            await window.meuClienteSupabase
-                .from("comentarios")
-                .select("*")
-                .eq("item_id", "quiz")
-                .order(
-                    "criado_em",
-                    {
-                        ascending: false
+                        return;
                     }
-                );
 
+                    const autor = `${nome} - ${serie}`;
 
-        if (error) {
+                    const { data, error } = await window.meuClienteSupabase
+                        .from("comentarios")
+                        .insert([
+                            {
+                                item_id: "quiz",
+                                autor: autor,
+                                texto: texto,
+                            },
+                        ])
+                        .select();
 
-            console.error(error);
+                    if (error) {
+                        console.error(error);
 
-            return;
+                        alert("Erro ao publicar: " + error.message);
 
-        }
+                        return;
+                    }
 
+                    if (data && data.length > 0) {
+                        renderizarComentario(data[0]);
+                    }
 
-        if (data) {
+                    document.getElementById("form-comentario").reset();
+                });
 
-            data.forEach(
-                comentario => {
+            async function carregarComentariosSalvos() {
+                const lista = document.getElementById("lista-comentarios");
 
-                    renderizarComentario(
-                        comentario
-                    );
+                lista.innerHTML = "";
 
+                try {
+                    const { data, error } = await window.meuClienteSupabase
+                        .from("comentarios")
+                        .select("*")
+                        .eq("item_id", "quiz")
+                        .order("criado_em", {
+                            ascending: false,
+                        });
+
+                    if (error) {
+                        console.error(error);
+
+                        return;
+                    }
+
+                    if (data) {
+                        data.forEach((comentario) => {
+                            renderizarComentario(comentario);
+                        });
+                    }
+                } catch (e) {
+                    console.error(e);
                 }
-            );
+            }
 
-        }
+            function renderizarComentario(c) {
+                const lista = document.getElementById("lista-comentarios");
 
-    } catch (e) {
+                const cartao = document.createElement("div");
 
-        console.error(e);
+                cartao.className = "comentario-quiz";
 
-    }
+                cartao.setAttribute("data-id", c.id);
 
-}
+                const dataFormatada = c.criado_em
+                    ? new Date(c.criado_em).toLocaleString("pt-BR")
+                    : "";
 
-
-function renderizarComentario(c) {
-
-    const lista =
-        document.getElementById(
-            "lista-comentarios"
-        );
-
-
-    const cartao =
-        document.createElement("div");
-
-
-    cartao.className =
-        "comentario-quiz";
-
-
-    cartao.setAttribute(
-        "data-id",
-        c.id
-    );
-
-
-    const dataFormatada =
-        c.criado_em
-            ? new Date(
-                c.criado_em
-              ).toLocaleString(
-                "pt-BR"
-              )
-            : "";
-
-
-    cartao.innerHTML = `
+                cartao.innerHTML = `
 
         <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
 
@@ -1117,127 +834,67 @@ function renderizarComentario(c) {
 
     `;
 
+                lista.appendChild(cartao);
+            }
 
-    lista.appendChild(cartao);
+            async function excluirComentario(id) {
+                if (!confirm("Deseja excluir este comentário?")) return;
 
-}
+                const { error } = await window.meuClienteSupabase
+                    .from("comentarios")
+                    .delete()
+                    .eq("id", id);
 
+                if (error) {
+                    alert("Erro ao excluir: " + error.message);
 
-async function excluirComentario(id) {
+                    return;
+                }
 
-    if (
-        !confirm(
-            "Deseja excluir este comentário?"
-        )
-    ) return;
+                const card = document.querySelector(`[data-id="${id}"]`);
 
+                if (card) {
+                    card.remove();
+                }
+            }
 
-    const { error } =
-        await window.meuClienteSupabase
-            .from("comentarios")
-            .delete()
-            .eq("id", id);
+            async function editarComentario(id) {
+                const novoTexto = prompt("Edite seu comentário:");
 
+                if (novoTexto === null || novoTexto.trim() === "") return;
 
-    if (error) {
+                const { data, error } = await window.meuClienteSupabase
+                    .from("comentarios")
+                    .update({
+                        texto: novoTexto.trim(),
+                    })
+                    .eq("id", id)
+                    .select();
 
-        alert(
-            "Erro ao excluir: " +
-            error.message
-        );
+                if (error) {
+                    alert("Erro ao editar: " + error.message);
 
-        return;
+                    return;
+                }
 
-    }
+                if (data && data.length > 0) {
+                    const card = document.querySelector(`[data-id="${id}"]`);
 
+                    if (card) {
+                        const texto = card.querySelector("p");
 
-    const card =
-        document.querySelector(
-            `[data-id="${id}"]`
-        );
+                        texto.innerText = data[0].texto;
+                    }
+                }
+            }
 
+            function escapeHtml(texto) {
+                const div = document.createElement("div");
 
-    if (card) {
+                div.textContent = texto;
 
-        card.remove();
-
-    }
-
-}
-
-
-async function editarComentario(id) {
-
-    const novoTexto =
-        prompt(
-            "Edite seu comentário:"
-        );
-
-
-    if (
-        novoTexto === null ||
-        novoTexto.trim() === ""
-    ) return;
-
-
-    const { data, error } =
-        await window.meuClienteSupabase
-            .from("comentarios")
-            .update({
-                texto: novoTexto.trim()
-            })
-            .eq("id", id)
-            .select();
-
-
-    if (error) {
-
-        alert(
-            "Erro ao editar: " +
-            error.message
-        );
-
-        return;
-
-    }
-
-
-    if (data && data.length > 0) {
-
-        const card =
-            document.querySelector(
-                `[data-id="${id}"]`
-            );
-
-
-        if (card) {
-
-            const texto =
-                card.querySelector("p");
-
-            texto.innerText =
-                data[0].texto;
-
-        }
-
-    }
-
-}
-
-
-function escapeHtml(texto) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent =
-        texto;
-
-    return div.innerHTML;
-
-}
-
-</script>
-
-</body>
+                return div.innerHTML;
+            }
+        </script>
+    </body>
 </html>

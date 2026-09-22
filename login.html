@@ -1,207 +1,209 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login do Professor - Química com Professor Wendel</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabaseClient.js"></script>
-<style>
-    .container-login {
-        max-width: 400px;
-        margin: 80px auto;
-        padding: 30px;
-        background: #1e2621;
-        border-radius: 12px;
-        color: white;
-        border: 1px solid #a3e4d7;
-        font-family: Arial, sans-serif;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Login do Professor - Química com Professor Wendel</title>
+        <link rel="stylesheet" href="css/style.css" />
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="js/supabaseClient.js"></script>
+        <style>
+            .container-login {
+                max-width: 400px;
+                margin: 80px auto;
+                padding: 30px;
+                background: #1e2621;
+                border-radius: 12px;
+                color: white;
+                border: 1px solid #a3e4d7;
+                font-family: Arial, sans-serif;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            }
 
-    .container-login h2 {
-        text-align: center;
-        color: #a3e4d7;
-        margin-bottom: 10px;
-    }
+            .container-login h2 {
+                text-align: center;
+                color: #a3e4d7;
+                margin-bottom: 10px;
+            }
 
-    .descricao {
-        text-align: center;
-        font-size: 14px;
-        color: #ccc;
-        margin-bottom: 25px;
-    }
+            .descricao {
+                text-align: center;
+                font-size: 14px;
+                color: #ccc;
+                margin-bottom: 25px;
+            }
 
-    .container-login label {
-        display: block;
-        margin-top: 15px;
-        margin-bottom: 5px;
-        font-weight: bold;
-    }
+            .container-login label {
+                display: block;
+                margin-top: 15px;
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
 
-    .container-login input {
-        width: 100%;
-        padding: 12px;
-        border-radius: 6px;
-        border: 1px solid #555;
-        background: #2a352f;
-        color: white;
-        box-sizing: border-box;
-        outline: none;
-    }
+            .container-login input {
+                width: 100%;
+                padding: 12px;
+                border-radius: 6px;
+                border: 1px solid #555;
+                background: #2a352f;
+                color: white;
+                box-sizing: border-box;
+                outline: none;
+            }
 
-    .container-login input:focus {
-        border-color: #a3e4d7;
-    }
+            .container-login input:focus {
+                border-color: #a3e4d7;
+            }
 
-    .container-login button {
-        width: 100%;
-        margin-top: 25px;
-        background: #28a745;
-        color: white;
-        padding: 12px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 16px;
-        transition: 0.3s;
-    }
+            .container-login button {
+                width: 100%;
+                margin-top: 25px;
+                background: #28a745;
+                color: white;
+                padding: 12px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: bold;
+                font-size: 16px;
+                transition: 0.3s;
+            }
 
-    .container-login button:hover {
-        background: #218838;
-        transform: scale(1.02);
-    }
+            .container-login button:hover {
+                background: #218838;
+                transform: scale(1.02);
+            }
 
-    .container-login button:disabled {
-        background: #555;
-        cursor: not-allowed;
-        transform: none;
-    }
+            .container-login button:disabled {
+                background: #555;
+                cursor: not-allowed;
+                transform: none;
+            }
 
-    .mensagem {
-        display: none;
-        margin-top: 15px;
-        padding: 10px;
-        border-radius: 6px;
-        text-align: center;
-        font-size: 14px;
-    }
+            .mensagem {
+                display: none;
+                margin-top: 15px;
+                padding: 10px;
+                border-radius: 6px;
+                text-align: center;
+                font-size: 14px;
+            }
 
-    .erro {
-        display: block;
-        background: #5c1f1f;
-        border: 1px solid #dc3545;
-        color: #ffb3b3;
-    }
+            .erro {
+                display: block;
+                background: #5c1f1f;
+                border: 1px solid #dc3545;
+                color: #ffb3b3;
+            }
 
-    .sucesso {
-        display: block;
-        background: #1d4d2b;
-        border: 1px solid #28a745;
-        color: #b8ffc8;
-    }
+            .sucesso {
+                display: block;
+                background: #1d4d2b;
+                border: 1px solid #28a745;
+                color: #b8ffc8;
+            }
 
-    .voltar-home {
-        text-align: center;
-        margin-top: 20px;
-    }
+            .voltar-home {
+                text-align: center;
+                margin-top: 20px;
+            }
 
-    .voltar-home a {
-        color: #00b4d8;
-        text-decoration: none;
-    }
+            .voltar-home a {
+                color: #00b4d8;
+                text-decoration: none;
+            }
 
-    .voltar-home a:hover {
-        text-decoration: underline;
-    }
-</style>
-</head>
+            .voltar-home a:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
 
-<body>
+    <body>
+        <div class="container-login">
+            <h2>🔐 Login do Professor</h2>
 
-<div class="container-login">
+            <p class="descricao">Acesso exclusivo para o Professor Wendel.</p>
 
-    <h2>🔐 Login do Professor</h2>
+            <form id="form-login">
+                <label for="email-login">E-mail:</label>
+                <input
+                    type="email"
+                    id="email-login"
+                    placeholder="seu-email@dominio.com"
+                    autocomplete="email"
+                    required
+                />
 
-    <p class="descricao">
-        Acesso exclusivo para o Professor Wendel.
-    </p>
+                <label for="senha-login">Senha:</label>
+                <input
+                    type="password"
+                    id="senha-login"
+                    placeholder="Digite sua senha"
+                    autocomplete="current-password"
+                    required
+                />
 
-    <form id="form-login">
+                <button type="submit" id="botao-login">Entrar</button>
+            </form>
 
-        <label for="email-login">E-mail:</label>
-        <input
-            type="email"
-            id="email-login"
-            placeholder="seu-email@dominio.com"
-            autocomplete="email"
-            required
-        >
+            <div id="mensagem" class="mensagem"></div>
 
-        <label for="senha-login">Senha:</label>
-        <input
-            type="password"
-            id="senha-login"
-            placeholder="Digite sua senha"
-            autocomplete="current-password"
-            required
-        >
+            <div class="voltar-home">
+                <a href="index.html">← Voltar para a página inicial</a>
+            </div>
+        </div>
 
-        <button type="submit" id="botao-login">
-            Entrar
-        </button>
+        <script src="js/utils.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const form = document.getElementById("form-login");
+                const msg = document.getElementById("mensagem");
+                const btn = document.getElementById("botao-login");
 
-    </form>
+                if (form) {
+                    form.addEventListener("submit", async (e) => {
+                        e.preventDefault();
+                        const email = document.getElementById("email-login").value.trim();
+                        const senha = document.getElementById("senha-login").value;
 
-    <div id="mensagem" class="mensagem"></div>
+                        if (!email || !senha) return;
 
-    <div class="voltar-home">
-        <a href="index.html">← Voltar para a página inicial</a>
-    </div>
+                        btn.disabled = true;
+                        btn.innerText = "Entrando...";
+                        msg.className = "mensagem";
+                        msg.style.display = "none";
 
-</div>
-
-<script src="js/utils.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const form = document.getElementById("form-login");
-        const msg = document.getElementById("mensagem");
-        const btn = document.getElementById("botao-login");
-
-        if (form) {
-            form.addEventListener("submit", async (e) => {
-                e.preventDefault();
-                const email = document.getElementById("email-login").value.trim();
-                const senha = document.getElementById("senha-login").value;
-
-                if (!email || !senha) return;
-
-                btn.disabled = true;
-                btn.innerText = "Entrando...";
-                msg.className = "mensagem";
-                msg.style.display = "none";
-
-                const res = await fazerLogin(email, senha);
-                if (res && res.sucesso) {
-                    msg.className = "mensagem sucesso";
-                    msg.innerText = "Login realizado com sucesso! Redirecionando...";
-                    setTimeout(() => {
-                        window.location.href = "index.html";
-                    }, 1000);
-                } else {
-                    btn.disabled = false;
-                    btn.innerText = "Entrar";
-                    msg.className = "mensagem erro";
-                    msg.innerText = "Erro ao entrar: " + (res && res.erro ? res.erro : "Credenciais inválidas");
+                        const res = await fazerLogin(email, senha);
+                        if (res && res.sucesso) {
+                            msg.className = "mensagem sucesso";
+                            msg.innerText = "Login realizado com sucesso! Redirecionando...";
+                            setTimeout(() => {
+                                window.location.href = "index.html";
+                            }, 1000);
+                        } else {
+                            btn.disabled = false;
+                            btn.innerText = "Entrar";
+                            msg.className = "mensagem erro";
+                            msg.innerText =
+                                "Erro ao entrar: " +
+                                (res && res.erro ? res.erro : "Credenciais inválidas");
+                        }
+                    });
                 }
             });
-        }
-    });
-</script>
-<footer>
-    <p>© 2026 - <a href="https://github.com/gustavohenrimerry" target="_blank" rel="noopener noreferrer">Desenvolvido por Gustavo</a></p>
-</footer>
-</body>
+        </script>
+        <footer>
+            <p>
+                © 2026 -
+                <a
+                    href="https://github.com/gustavohenrimerry"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Desenvolvido por Gustavo
+                </a>
+            </p>
+        </footer>
+    </body>
 </html>

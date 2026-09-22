@@ -1,331 +1,386 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Professor Wendel - Química</title>
+        <link rel="stylesheet" href="../css/style.css" />
 
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Professor Wendel - Química</title>
-<link rel="stylesheet" href="../css/style.css">
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="../js/supabaseClient.js"></script>
+        <script src="../js/utils.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../js/supabaseClient.js"></script>
-<script src="../js/utils.js"></script>
-
-<style>
-    .painel-admin {
-        background: rgba(0, 0, 0, 0.3);
-        border: 2px dashed #00d2ff;
-        padding: 20px;
-        margin: 20px auto;
-        max-width: 800px;
-        border-radius: 12px;
-        text-align: center;
-        display: none;
-    }
-    .painel-admin input, .painel-admin textarea {
-        width: 100%;
-        padding: 10px;
-        margin: 8px 0;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        background: #222;
-        color: #fff;
-    }
-    .painel-admin button {
-        background: #00d2ff;
-        color: #000;
-        border: none;
-        padding: 10px 20px;
-        font-weight: bold;
-        border-radius: 6px;
-        cursor: pointer;
-        margin-top: 10px;
-    }
-    .painel-admin button:hover {
-        background: #0099bb;
-    }
-    .btn-card-action {
-        background: #333;
-        color: #fff;
-        border: 1px solid #555;
-        padding: 6px 12px;
-        border-radius: 4px;
-        cursor: pointer;
-        margin: 5px 3px;
-        font-size: 13px;
-    }
-    .btn-card-action:hover {
-        background: #555;
-    }
-    .btn-excluir {
-        background: #ff4d4d;
-        border-color: #cc0000;
-    }
-    .btn-excluir:hover {
-        background: #cc0000;
-    }
-    .card-actions {
-        margin-top: 15px;
-        border-top: 1px solid #444;
-        padding-top: 10px;
-        display: none;
-    }
-    .btn-login-container {
-        text-align: center;
-        margin: 15px 0;
-    }
-    .btn-login {
-        background: #28a745;
-        color: #fff;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: bold;
-    }
-    .btn-login:hover {
-        background: #218838;
-    }
-    .logo img {
-        height: 40px;
-        object-fit: contain;
-        vertical-align: middle;
-    }
-</style>
-</head>
-
-<body>
-
-<div id="barra-admin">
-    <span id="status-admin" style="color: #a3e4d7; font-weight: bold; margin-right: 15px;">🔒 Modo Visitante</span>
-    <div id="bloco-login" style="display: inline-block;">
-        <input type="email" id="email-prof" placeholder="E-mail do Professor" style="width: 180px;">
-        <input type="password" id="senha-prof" placeholder="Senha" style="width: 140px;">
-        <button onclick="entrarAdmin()" style="background: #00b4d8; color: white;">Entrar</button>
-    </div>
-    <div id="botoes-admin" style="display: none;">
-        <button onclick="sairAdmin()" style="background: #dc3545; color: white; margin-left: 5px;">Sair</button>
-    </div>
-</div>
-
-<header>
-    <div class="logo">
-        <a href="../index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px; color: inherit;">  
-        <img src="../assets/imagens/logo/logo.png" alt="Logo Química com Professor Wendel">
-        Química com Professor Wendel
-    </div>
-
-    <nav>
-        <a href="../index.html">Início</a>
-        <a href="experimentos.html">Experimentos</a>
-        <a href="videos.html">Vídeos</a>
-        <a href="perguntas.html">Perguntas</a>
-        <a href="professor.html">Professor</a>
-        <a href="../sugestoes.html">Sugestões</a>
-    </nav>
-</header>
-
-<section class="banner-paginas">
-    <div>
-        <h1>👨‍🏫 Professor Wendel</h1>
-        <p>Conheça o criador do ambiente de estudos de Química.</p>
-    </div>
-</section>
-
-<div class="painel-admin" id="painelAdmin">
-    <h3>🛠️ Painel do Professor (Gerenciar Cards)</h3>
-    <p style="font-size: 14px; color: #ccc;">Adicione um novo card preenchendo os campos abaixo.</p>
-    <form id="formAdicionarCard" onsubmit="adicionarCard(event)">
-        <input type="text" id="novoTitulo" placeholder="Título do Card (Ex: Avisos Importantes)" required>
-        <textarea id="novoTexto" rows="3" placeholder="Texto/Conteúdo do Card..." required></textarea>
-        <button type="submit">➕ Adicionar Novo Card</button>
-    </form>
-</div>
-
-<section>
-    <div class="container" id="containerCards">
-    </div>
-</section>
-
-<footer>
-    <p>© 2026 - <a href="https://github.com/gustavohenrimerry" target="_blank" rel="noopener noreferrer">Desenvolvido por Gustavo</a></p>
-</footer>
-
-<script>
-    const cardsIniciais = [
-        {
-            id: 'card-sobre',
-            titulo: 'Sobre o Professor Wendel',
-            texto: 'Professor dedicado ao ensino e popularização da Química, conectando teoria, experimentos práticos e tecnologia.',
-            tipo: 'sobre',
-            imagem: '../assets/imagens/professor/professor.png'
-        }
-    ];
-
-    document.addEventListener("DOMContentLoaded", async function() {
-        await inicializarBancoCards();
-        verificarEstadoProfessorInicial();
-        renderizarCards();
-    });
-
-    async function inicializarBancoCards() {
-        let { data, error } = await supabaseClient.from('cards_professor').select('*');
-        if (error) {
-            console.error("Erro ao verificar cards do professor:", error.message);
-            return;
-        }
-        if (!data || data.length === 0) {
-            for (let c of cardsIniciais) {
-                await supabaseClient.from('cards_professor').insert([{
-                    id: c.id,
-                    titulo: c.titulo,
-                    texto: c.texto,
-                    tipo: c.tipo || 'normal',
-                    imagem: c.imagem || null
-                }]).select();
+        <style>
+            .painel-admin {
+                background: rgba(0, 0, 0, 0.3);
+                border: 2px dashed #00d2ff;
+                padding: 20px;
+                margin: 20px auto;
+                max-width: 800px;
+                border-radius: 12px;
+                text-align: center;
+                display: none;
             }
-        }
-    }
-
-    async function verificarEstadoProfessorInicial() {
-        if (await verificarSeProfessor()) {
-            const painel = document.getElementById('painelAdmin');
-            if (painel) painel.style.display = 'block';
-            const btnAuth = document.getElementById('btnAuth');
-            if (btnAuth) {
-                btnAuth.innerText = '🔓 Sair do Painel do Professor';
-                btnAuth.style.background = '#dc3545';
+            .painel-admin input,
+            .painel-admin textarea {
+                width: 100%;
+                padding: 10px;
+                margin: 8px 0;
+                border-radius: 6px;
+                border: 1px solid #ccc;
+                background: #222;
+                color: #fff;
             }
-        }
-    }
+            .painel-admin button {
+                background: #00d2ff;
+                color: #000;
+                border: none;
+                padding: 10px 20px;
+                font-weight: bold;
+                border-radius: 6px;
+                cursor: pointer;
+                margin-top: 10px;
+            }
+            .painel-admin button:hover {
+                background: #0099bb;
+            }
+            .btn-card-action {
+                background: #333;
+                color: #fff;
+                border: 1px solid #555;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                margin: 5px 3px;
+                font-size: 13px;
+            }
+            .btn-card-action:hover {
+                background: #555;
+            }
+            .btn-excluir {
+                background: #ff4d4d;
+                border-color: #cc0000;
+            }
+            .btn-excluir:hover {
+                background: #cc0000;
+            }
+            .card-actions {
+                margin-top: 15px;
+                border-top: 1px solid #444;
+                padding-top: 10px;
+                display: none;
+            }
+            .btn-login-container {
+                text-align: center;
+                margin: 15px 0;
+            }
+            .btn-login {
+                background: #28a745;
+                color: #fff;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: bold;
+            }
+            .btn-login:hover {
+                background: #218838;
+            }
 
-    async function alternarAuth() {
-        if (!(await verificarSeProfessor())) {
-            await loginViaPainel();
-        } else {
-            await logoutProfessor();
-        }
-    }
+        </style>
+    </head>
 
-    async function obterCards() {
-        let { data, error } = await supabaseClient.from('cards_professor').select('*');
-        if (error || !data || data.length === 0) {
-            return cardsIniciais;
-        }
-        return data;
-    }
+    <body>
+        <div id="barra-admin">
+            <span id="status-admin" style="color: #a3e4d7; font-weight: bold; margin-right: 15px">
+                🔒 Modo Visitante
+            </span>
+            <div id="bloco-login" style="display: inline-block">
+                <input
+                    type="email"
+                    id="email-prof"
+                    placeholder="E-mail do Professor"
+                    style="width: 180px"
+                />
+                <input type="password" id="senha-prof" placeholder="Senha" style="width: 140px" />
+                <button onclick="entrarAdmin()" style="background: #00b4d8; color: white">
+                    Entrar
+                </button>
+            </div>
+            <div id="botoes-admin" style="display: none">
+                <button
+                    onclick="sairAdmin()"
+                    style="background: #dc3545; color: white; margin-left: 5px"
+                >
+                    Sair
+                </button>
+            </div>
+        </div>
 
-    async function renderizarCards() {
-        const container = document.getElementById('containerCards');
-        const cards = await obterCards();
-        container.innerHTML = '';
-        let logado = await verificarSeProfessor();
+        <header>
+            <div class="logo">
+                <a
+                    href="../index.html"
+                    style="
+                        text-decoration: none;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        color: inherit;
+                    "
+                >
+                    <img
+                        src="../assets/imagens/logo/logo.png"
+                        alt="Logo Química com Professor Wendel"
+                    />
+                    Química com Professor Wendel
+                </a>
+            </div>
 
-        cards.forEach(card => {
-            const divCard = document.createElement('div');
-            divCard.className = 'card';
-            divCard.style.textAlign = 'center';
-            divCard.style.display = 'block';
+            <nav>
+                <a href="../index.html">Início</a>
+                <a href="experimentos.html">Experimentos</a>
+                <a href="videos.html">Vídeos</a>
+                <a href="perguntas.html">Perguntas</a>
+                <a href="professor.html">Professor</a>
+                <a href="../sugestoes.html">Sugestões</a>
+            </nav>
+        </header>
 
-            let htmlConteudo = '';
+        <section class="banner-paginas">
+            <div>
+                <h1 style="color: white;">👨‍🏫 Professor Wendel</h1>
+                <p>Conheça o criador do ambiente de estudos de Química.</p>
+            </div>
+        </section>
 
-            if (card.tipo === 'sobre' && card.imagem) {
-                htmlConteudo += `
+        <div class="painel-admin" id="painelAdmin">
+            <h3>🛠️ Painel do Professor (Gerenciar Cards)</h3>
+            <p style="font-size: 14px; color: #ccc">
+                Adicione um novo card preenchendo os campos abaixo.
+            </p>
+            <form id="formAdicionarCard" onsubmit="adicionarCard(event)">
+                <input
+                    type="text"
+                    id="novoTitulo"
+                    placeholder="Título do Card (Ex: Avisos Importantes)"
+                    required
+                />
+                <textarea
+                    id="novoTexto"
+                    rows="3"
+                    placeholder="Texto/Conteúdo do Card..."
+                    required
+                ></textarea>
+                <button type="submit">➕ Adicionar Novo Card</button>
+            </form>
+        </div>
+
+        <section>
+            <div class="container" id="containerCards"></div>
+        </section>
+
+        <footer>
+            <p>
+                © 2026 -
+                <a
+                    href="https://github.com/gustavohenrimerry"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Desenvolvido por Gustavo
+                </a>
+            </p>
+        </footer>
+
+        <script>
+            const cardsIniciais = [
+                {
+                    id: "card-sobre",
+                    titulo: "Sobre o Professor Wendel",
+                    texto: "Professor dedicado ao ensino e popularização da Química, conectando teoria, experimentos práticos e tecnologia.",
+                    tipo: "sobre",
+                    imagem: "../assets/imagens/professor/wendel.png",
+                },
+            ];
+
+            document.addEventListener("DOMContentLoaded", async function () {
+                await inicializarBancoCards();
+                verificarEstadoProfessorInicial();
+                renderizarCards();
+            });
+
+            async function inicializarBancoCards() {
+                let { data, error } = await supabaseClient.from("cards_professor").select("*");
+                if (error) {
+                    console.error("Erro ao verificar cards do professor:", error.message);
+                    return;
+                }
+                if (!data || data.length === 0) {
+                    for (let c of cardsIniciais) {
+                        await supabaseClient
+                            .from("cards_professor")
+                            .insert([
+                                {
+                                    id: c.id,
+                                    titulo: c.titulo,
+                                    texto: c.texto,
+                                    tipo: c.tipo || "normal",
+                                    imagem: c.imagem || null,
+                                },
+                            ])
+                            .select();
+                    }
+                }
+            }
+
+            async function verificarEstadoProfessorInicial() {
+                if (await verificarSeProfessor()) {
+                    const painel = document.getElementById("painelAdmin");
+                    if (painel) painel.style.display = "block";
+                    const btnAuth = document.getElementById("btnAuth");
+                    if (btnAuth) {
+                        btnAuth.innerText = "🔓 Sair do Painel do Professor";
+                        btnAuth.style.background = "#dc3545";
+                    }
+                }
+            }
+
+            async function alternarAuth() {
+                if (!(await verificarSeProfessor())) {
+                    await loginViaPainel();
+                } else {
+                    await logoutProfessor();
+                }
+            }
+
+            async function obterCards() {
+                let { data, error } = await supabaseClient.from("cards_professor").select("*");
+                if (error || !data || data.length === 0) {
+                    return cardsIniciais;
+                }
+                return data;
+            }
+
+            async function renderizarCards() {
+                const container = document.getElementById("containerCards");
+                const cards = await obterCards();
+                container.innerHTML = "";
+                let logado = await verificarSeProfessor();
+
+                cards.forEach((card) => {
+                    const divCard = document.createElement("div");
+                    divCard.className = "card";
+                    divCard.style.textAlign = "center";
+                    divCard.style.display = "block";
+
+                    let htmlConteudo = "";
+
+                    if (card.tipo === "sobre" && card.imagem) {
+                        htmlConteudo += `
                     <div style="display: flex; justify-content: center; width: 100%;">
                         <img src="${card.imagem}" alt="Professor Wendel" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; display: block;">
                     </div>
                 `;
-            }
+                    }
 
-            htmlConteudo += `<h2>${card.titulo}</h2>`;
-            htmlConteudo += `<p style="margin-bottom: 15px; text-align: left; padding: 0 10px;">${card.texto}</p>`;
+                    htmlConteudo += `<h2 style="color: white;">${card.titulo}</h2>`;
+                    htmlConteudo += `<p style="margin-bottom: 15px; text-align: left; padding: 0 10px;">${card.texto}</p>`;
 
-            let estiloAcoes = logado ? 'display: block;' : 'display: none;';
-            htmlConteudo += `
+                    let estiloAcoes = logado ? "display: block;" : "display: none;";
+                    htmlConteudo += `
                 <div class="card-actions" style="${estiloAcoes}">
                     <button class="btn-card-action" onclick="editarCard('${card.id}')">✏️ Editar</button>
                     <button class="btn-card-action btn-excluir" onclick="excluirCard('${card.id}')">🗑️ Excluir</button>
                 </div>
             `;
 
-            divCard.innerHTML = htmlConteudo;
-            container.appendChild(divCard);
-        });
-    }
-
-    async function adicionarCard(event) {
-        event.preventDefault();
-        if (!(await verificarSeProfessor())) return;
-
-        const titulo = document.getElementById('novoTitulo').value;
-        let texto = document.getElementById('novoTexto').value;
-        texto = texto.replace(/\n/g, '<br>');
-
-        const novoId = 'card-' + new Date().getTime();
-        const novoCard = {
-            id: novoId,
-            tipo: 'normal',
-            titulo: titulo,
-            texto: texto,
-            imagem: null
-        };
-
-        let { error } = await supabaseClient.from('cards_professor').insert([novoCard]);
-        if (error) {
-            alert("Erro ao adicionar card: " + error.message);
-            return;
-        }
-
-        document.getElementById('formAdicionarCard').reset();
-        renderizarCards();
-        alert("Card adicionado com sucesso!");
-    }
-
-    async function excluirCard(id) {
-        if (!(await verificarSeProfessor())) return;
-
-        if (confirm('Tem certeza que deseja excluir este card completamente?')) {
-            let { error } = await supabaseClient.from('cards_professor').delete().eq('id', id);
-            if (error) {
-                alert("Erro ao excluir: " + error.message);
-                return;
+                    divCard.innerHTML = htmlConteudo;
+                    container.appendChild(divCard);
+                });
             }
-            renderizarCards();
-            alert("Card excluído com sucesso!");
-        }
-    }
 
-    async function editarCard(id) {
-        if (!(await verificarSeProfessor())) return;
+            async function adicionarCard(event) {
+                event.preventDefault();
+                if (!(await verificarSeProfessor())) return;
 
-        let { data } = await supabaseClient.from('cards_professor').select('*').eq('id', id);
-        let card = data ? data[0] : null;
-        if (!card) return;
+                const titulo = document.getElementById("novoTitulo").value;
+                let texto = document.getElementById("novoTexto").value;
+                texto = texto.replace(/\n/g, "<br>");
 
-        let textoLimpo = card.texto.replace(/<br\s*[\/]?>/gi, '\n');
+                const novoId = "card-" + new Date().getTime();
+                const novoCard = {
+                    id: novoId,
+                    tipo: "normal",
+                    titulo: titulo,
+                    texto: texto,
+                    imagem: null,
+                };
 
-        let novoTitulo = prompt("Edite o Título do Card:", card.titulo);
-        if (novoTitulo === null) return;
+                let { error } = await supabaseClient.from("cards_professor").insert([novoCard]);
+                if (error) {
+                    alert("Erro ao adicionar card: " + error.message);
+                    return;
+                }
 
-        let novoTexto = prompt("Edite o Texto do Card:", textoLimpo);
-        if (novoTexto === null) return;
+                document.getElementById("formAdicionarCard").reset();
+                renderizarCards();
+                alert("Card adicionado com sucesso!");
+            }
 
-        novoTexto = novoTexto.replace(/\n/g, '<br>');
+            async function excluirCard(id) {
+                if (!(await verificarSeProfessor())) return;
 
-        let { error } = await supabaseClient.from('cards_professor').update({
-            titulo: novoTitulo,
-            texto: novoTexto
-        }).eq('id', id);
+                if (confirm("Tem certeza que deseja excluir este card completamente?")) {
+                    let { error } = await supabaseClient
+                        .from("cards_professor")
+                        .delete()
+                        .eq("id", id);
+                    if (error) {
+                        alert("Erro ao excluir: " + error.message);
+                        return;
+                    }
+                    renderizarCards();
+                    alert("Card excluído com sucesso!");
+                }
+            }
 
-        if (error) {
-            alert("Erro ao atualizar: " + error.message);
-            return;
-        }
+            async function editarCard(id) {
+                if (!(await verificarSeProfessor())) return;
 
-        renderizarCards();
-        alert("Card alterado com sucesso!");
-    }
-</script>
+                let { data } = await supabaseClient
+                    .from("cards_professor")
+                    .select("*")
+                    .eq("id", id);
+                let card = data ? data[0] : null;
+                if (!card) return;
 
-</body>
+                let textoLimpo = card.texto.replace(/<br\s*[\/]?>/gi, "\n");
+
+                let novoTitulo = prompt("Edite o Título do Card:", card.titulo);
+                if (novoTitulo === null) return;
+
+                let novoTexto = prompt("Edite o Texto do Card:", textoLimpo);
+                if (novoTexto === null) return;
+
+                novoTexto = novoTexto.replace(/\n/g, "<br>");
+
+                let { error } = await supabaseClient
+                    .from("cards_professor")
+                    .update({
+                        titulo: novoTitulo,
+                        texto: novoTexto,
+                    })
+                    .eq("id", id);
+
+                if (error) {
+                    alert("Erro ao atualizar: " + error.message);
+                    return;
+                }
+
+                renderizarCards();
+                alert("Card alterado com sucesso!");
+            }
+        </script>
+    </body>
 </html>

@@ -1,272 +1,512 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vídeos de Química - Professor Wendel</title>
+        <link rel="stylesheet" href="../css/style.css" />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vídeos de Química - Professor Wendel</title>
-    <link rel="stylesheet" href="../css/style.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../js/supabaseClient.js"></script>
-    <script src="../js/utils.js"></script>
-    <style>
-        .container {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
-            gap: 12px !important;
-            align-items: stretch !important;
-        }
-
-        section {
-            margin-bottom: 20px !important;
-            padding-top: 5px !important;
-            padding-bottom: 5px !important;
-        }
-
-        .card {
-            background: #1e1e1e !important;
-            border: 1px solid #333 !important;
-            padding: 12px !important;
-            border-radius: 8px !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-between !important;
-            height: auto !important;
-            min-height: 100% !important;
-            box-sizing: border-box !important;
-            float: none !important;
-        }
-
-        .card > div:first-child {
-            flex-grow: 1;
-        }
-
-        .secao-comentarios-card {
-            margin-top: 10px !important;
-            border-top: 1px solid #444;
-            padding-top: 8px;
-        }
-
-        .form-inputs-comentario {
-            display: flex;
-            gap: 2%;
-            margin-bottom: 4px;
-        }
-    </style>
-</head>
-
-<body>
-
-<div id="barra-admin">
-    <span id="status-admin" style="color: #a3e4d7; font-weight: bold; margin-right: 15px;">🔒 Modo Visitante</span>
-    <div id="bloco-login" style="display: inline-block;">
-        <input type="email" id="email-prof" placeholder="E-mail do Professor" style="width: 180px;">
-        <input type="password" id="senha-prof" placeholder="Senha" style="width: 140px;">
-        <button onclick="entrarAdmin()" style="background: #00b4d8; color: white;">Entrar</button>
-    </div>
-    <div id="botoes-admin" style="display: none;">
-        <button onclick="abrirPainelAdicionar()" style="background: #28a745; color: white;">➕ Adicionar Vídeo</button>
-        <button onclick="sairAdmin()" style="background: #dc3545; color: white; margin-left: 5px;">Sair</button>
-    </div>
-</div>
-
-<header>
-    <div class="logo">
-        <a href="../index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px; color: inherit;">
-            <img src="../assets/imagens/logo/logo.png" alt="Logo Química com Professor Wendel">
-            <span>Química com Professor Wendel</span>
-        </a>
-    </div>
-
-    <nav>
-        <a href="../index.html">Início</a>
-        <a href="experimentos.html">Experimentos</a>
-        <a href="videos.html">Vídeos</a>
-        <a href="perguntas.html">Perguntas</a>
-        <a href="professor.html">Professor</a>
-        <a href="../sugestoes.html">Sugestões</a>
-    </nav>
-</header>
-
-<section class="banner-paginas">
-    <div>
-        <h1>🎥 Vídeos de Química</h1>
-        <p>Aulas e explicações para aprender Química de forma visual.</p>
-    </div>
-</section>
-
-<section>
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
-        <h2 style="margin: 0; color: white;">Catálogo de Videoaulas</h2>
-        <div style="display: flex; gap: 10px;">
-            <button onclick="abrirPainelAdicionar()" id="btn-novo-vid" style="background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; display: none;">➕ Novo Vídeo</button>
-            <button onclick="alternarPainelAdmin()" id="btn-painel-toggle" style="background: #7c3aed; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">🔐 Painel do Professor</button>
-        </div>
-    </div>
-
-    <div id="painel-admin" style="display: none; background: #18181b; border: 1px solid #7c3aed; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <h3 style="color: #c084fc; margin: 0;">➕ Adicionar Novo Vídeo</h3>
-            <button onclick="sairModoProfessor()" style="background: #374151; color: #f87171; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">🔒 Sair do modo Professor</button>
-        </div>
-        <div style="display: grid; gap: 8px;">
-            <select id="novo-categoria" style="padding: 6px; border-radius: 4px; border: 1px solid #555; background: #222; color: white;">
-                <option value="6º Ano - Química Básica">🟢 6º Ano - Química Básica</option>
-                <option value="7º Ano - Átomos">🟡 7º Ano - Átomos</option>
-                <option value="8º Ano - Tabela Periódica e Ligações">🟠 8º Ano - Tabela Periódica e Ligações</option>
-                <option value="9º Ano - Química Avançada">🔴 9º Ano - Química Avançada</option>
-                <option value="Ensino Médio">🔵 Ensino Médio</option>
-            </select>
-            <input type="text" id="novo-titulo" placeholder="Título do Vídeo (ex: Átomos e Moléculas)" style="padding: 6px; border-radius: 4px; border: 1px solid #555; background: #222; color: white;">
-            <input type="text" id="novo-link" placeholder="Link normal do YouTube (ex: https://www.youtube.com/watch?v=...)" style="padding: 6px; border-radius: 4px; border: 1px solid #555; background: #222; color: white;">
-            <textarea id="novo-descricao" placeholder="Breve descrição do vídeo..." rows="2" style="padding: 6px; border-radius: 4px; border: 1px solid #555; background: #222; color: white; resize: vertical;"></textarea>
-            <button onclick="salvarNovoVideo()" style="background: #16a34a; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold;">Salvar e Publicar Vídeo</button>
-        </div>
-    </div>
-</section>
-
-<div id="container-categorias-videos"></div>
-
-<footer>
-    <p>© 2026 - <a href="https://github.com/gustavohenrimerry" target="_blank" rel="noopener noreferrer">Desenvolvido por Gustavo</a></p>
-</footer>
-
-<script>
-    // Usa o cliente global já inicializado em supabaseClient.js
-    const supabaseClient = window.meuClienteSupabase;
-
-    const videosPadrao = [
-        { id: 'vid-1', categoria: '6º Ano - Química Básica', titulo: 'Substâncias e Misturas', video: 'https://www.youtube.com/embed/hbwKwNhIFM4', descricao: 'Introdução à Química, matéria, objetos e substâncias.' },
-        { id: 'vid-2', categoria: '6º Ano - Química Básica', titulo: 'Tipos de Misturas', video: 'https://www.youtube.com/embed/L7cfPRNIfxQ', descricao: 'Misturas homogêneas e heterogêneas.' },
-        { id: 'vid-3', categoria: '6º Ano - Química Básica', titulo: 'Mistura Homogênea e Heterogênea', video: 'https://www.youtube.com/embed/2zU_3ganVj4', descricao: 'Diferenças entre tipos de misturas.' },
-        { id: 'vid-4', categoria: '7º Ano - Átomos', titulo: 'Estrutura Atômica', video: 'https://www.youtube.com/embed/jPL78QD6hBk', descricao: 'Como é formado o átomo?' },
-        { id: 'vid-5', categoria: '7º Ano - Átomos', titulo: 'Prótons, Nêutrons e Elétrons', video: 'https://www.youtube.com/embed/eav23HYcowI', descricao: 'Partículas presentes no átomo.' },
-        { id: 'vid-6', categoria: '8º Ano - Tabela Periódica e Ligações', titulo: 'Tabela Periódica', video: 'https://www.youtube.com/embed/Vsnq2hJ2UZc', descricao: 'Famílias, períodos e elementos químicos.' },
-        { id: 'vid-7', categoria: '8º Ano - Tabela Periódica e Ligações', titulo: 'Ligações Químicas', video: 'https://www.youtube.com/embed/99b6_HneB64', descricao: 'Formação de moléculas e ligações.' },
-        { id: 'vid-8', categoria: '9º Ano - Química Avançada', titulo: 'Reações Químicas e Balanceamento', video: 'https://www.youtube.com/embed/O9vPOw9dvM8', descricao: 'Reagentes, produtos e equações químicas.' },
-        { id: 'vid-9', categoria: '9º Ano - Química Avançada', titulo: 'Balanceamento de Equações', video: 'https://www.youtube.com/embed/yF8o5vTOGc4', descricao: 'Como equilibrar uma reação química.' },
-        { id: 'vid-10', categoria: 'Ensino Médio', titulo: 'Modelos Atômicos', video: 'https://www.youtube.com/embed/5-fa4IKp5bU', descricao: 'Modelos atômicos e evolução da ciência.' },
-        { id: 'vid-11', categoria: 'Ensino Médio', titulo: 'Termoquímica', video: 'https://www.youtube.com/embed/Phr3DSKLLhA', descricao: 'Energia nas reações químicas.' },
-        { id: 'vid-12', categoria: 'Ensino Médio', titulo: 'Eletroquímica', video: 'https://www.youtube.com/embed/-RU1ywag0Dg', descricao: 'Pilhas, eletrólise e oxirredução.' }
-    ];
-
-    document.addEventListener("DOMContentLoaded", async function() {
-        await inicializarBancoVideos();
-        carregarVideos();
-        verificarEstadoProfessorInicial();
-    });
-
-    async function inicializarBancoVideos() {
-        try {
-            let { data, error } = await supabaseClient.from('videos').select('*');
-            if (error) {
-                console.error("Erro ao verificar dados:", error.message);
-                return;
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="../js/supabaseClient.js"></script>
+        <script src="../js/utils.js"></script>
+        <style>
+            .container {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+                gap: 12px !important;
+                align-items: stretch !important;
             }
-            if (!data || data.length === 0) {
-                for (let v of videosPadrao) {
-                    await supabaseClient.from('videos').insert([v]);
+
+            section {
+                margin-bottom: 20px !important;
+                padding-top: 5px !important;
+                padding-bottom: 5px !important;
+            }
+
+            .card {
+                background: #1e1e1e !important;
+                border: 1px solid #333 !important;
+                padding: 12px !important;
+                border-radius: 8px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                height: auto !important;
+                min-height: 100% !important;
+                box-sizing: border-box !important;
+                float: none !important;
+            }
+
+            .card > div:first-child {
+                flex-grow: 1;
+            }
+
+            .secao-comentarios-card {
+                margin-top: 10px !important;
+                border-top: 1px solid #444;
+                padding-top: 8px;
+            }
+
+            .form-inputs-comentario {
+                display: flex;
+                gap: 2%;
+                margin-bottom: 4px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="barra-admin">
+            <span id="status-admin" style="color: #a3e4d7; font-weight: bold; margin-right: 15px">
+                🔒 Modo Visitante
+            </span>
+            <div id="bloco-login" style="display: inline-block">
+                <input
+                    type="email"
+                    id="email-prof"
+                    placeholder="E-mail do Professor"
+                    style="width: 180px"
+                />
+                <input type="password" id="senha-prof" placeholder="Senha" style="width: 140px" />
+                <button onclick="entrarAdmin()" style="background: #00b4d8; color: white">
+                    Entrar
+                </button>
+            </div>
+            <div id="botoes-admin" style="display: none">
+                <button onclick="abrirPainelAdicionar()" style="background: #28a745; color: white">
+                    ➕ Adicionar Vídeo
+                </button>
+                <button
+                    onclick="sairAdmin()"
+                    style="background: #dc3545; color: white; margin-left: 5px"
+                >
+                    Sair
+                </button>
+            </div>
+        </div>
+
+        <header>
+            <div class="logo">
+                <a
+                    href="../index.html"
+                    style="
+                        text-decoration: none;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        color: inherit;
+                    "
+                >
+                    <img
+                        src="../assets/imagens/logo/logo.png"
+                        alt="Logo Química com Professor Wendel"
+                    />
+                    <span>Química com Professor Wendel</span>
+                </a>
+            </div>
+
+            <nav>
+                <a href="../index.html">Início</a>
+                <a href="experimentos.html">Experimentos</a>
+                <a href="videos.html">Vídeos</a>
+                <a href="perguntas.html">Perguntas</a>
+                <a href="professor.html">Professor</a>
+                <a href="../sugestoes.html">Sugestões</a>
+            </nav>
+        </header>
+
+        <section class="banner-paginas">
+            <div>
+                <h1>🎥 Vídeos de Química</h1>
+                <p>Aulas e explicações para aprender Química de forma visual.</p>
+            </div>
+        </section>
+
+        <section>
+            <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                    margin-bottom: 10px;
+                "
+            >
+                <h2 style="margin: 0; color: white">Catálogo de Videoaulas</h2>
+                <div style="display: flex; gap: 10px">
+                    <button
+                        onclick="abrirPainelAdicionar()"
+                        id="btn-novo-vid"
+                        style="
+                            background: #16a34a;
+                            color: white;
+                            border: none;
+                            padding: 6px 12px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-weight: bold;
+                            display: none;
+                        "
+                    >
+                        ➕ Novo Vídeo
+                    </button>
+                    <button
+                        onclick="alternarPainelAdmin()"
+                        id="btn-painel-toggle"
+                        style="
+                            background: #7c3aed;
+                            color: white;
+                            border: none;
+                            padding: 6px 12px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-weight: bold;
+                        "
+                    >
+                        🔐 Painel do Professor
+                    </button>
+                </div>
+            </div>
+
+            <div
+                id="painel-admin"
+                style="
+                    display: none;
+                    background: #18181b;
+                    border: 1px solid #7c3aed;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin-bottom: 15px;
+                "
+            >
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 8px;
+                    "
+                >
+                    <h3 style="color: #c084fc; margin: 0">➕ Adicionar Novo Vídeo</h3>
+                    <button
+                        onclick="sairModoProfessor()"
+                        style="
+                            background: #374151;
+                            color: #f87171;
+                            border: none;
+                            padding: 4px 8px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-size: 11px;
+                        "
+                    >
+                        🔒 Sair do modo Professor
+                    </button>
+                </div>
+                <div style="display: grid; gap: 8px">
+                    <select
+                        id="novo-categoria"
+                        style="
+                            padding: 6px;
+                            border-radius: 4px;
+                            border: 1px solid #555;
+                            background: #222;
+                            color: white;
+                        "
+                    >
+                        <option value="6º Ano - Química Básica">🟢 6º Ano - Química Básica</option>
+                        <option value="7º Ano - Átomos">🟡 7º Ano - Átomos</option>
+                        <option value="8º Ano - Tabela Periódica e Ligações">
+                            🟠 8º Ano - Tabela Periódica e Ligações
+                        </option>
+                        <option value="9º Ano - Química Avançada">
+                            🔴 9º Ano - Química Avançada
+                        </option>
+                        <option value="Ensino Médio">🔵 Ensino Médio</option>
+                    </select>
+                    <input
+                        type="text"
+                        id="novo-titulo"
+                        placeholder="Título do Vídeo (ex: Átomos e Moléculas)"
+                        style="
+                            padding: 6px;
+                            border-radius: 4px;
+                            border: 1px solid #555;
+                            background: #222;
+                            color: white;
+                        "
+                    />
+                    <input
+                        type="text"
+                        id="novo-link"
+                        placeholder="Link normal do YouTube (ex: https://www.youtube.com/watch?v=...)"
+                        style="
+                            padding: 6px;
+                            border-radius: 4px;
+                            border: 1px solid #555;
+                            background: #222;
+                            color: white;
+                        "
+                    />
+                    <textarea
+                        id="novo-descricao"
+                        placeholder="Breve descrição do vídeo..."
+                        rows="2"
+                        style="
+                            padding: 6px;
+                            border-radius: 4px;
+                            border: 1px solid #555;
+                            background: #222;
+                            color: white;
+                            resize: vertical;
+                        "
+                    ></textarea>
+                    <button
+                        onclick="salvarNovoVideo()"
+                        style="
+                            background: #16a34a;
+                            color: white;
+                            border: none;
+                            padding: 8px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-weight: bold;
+                        "
+                    >
+                        Salvar e Publicar Vídeo
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div id="container-categorias-videos"></div>
+
+        <footer>
+            <p>
+                © 2026 -
+                <a
+                    href="https://github.com/gustavohenrimerry"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Desenvolvido por Gustavo
+                </a>
+            </p>
+        </footer>
+
+        <script>
+            // Usa o cliente global já inicializado em supabaseClient.js
+            const supabaseClient = window.meuClienteSupabase;
+
+            const videosPadrao = [
+                {
+                    id: "vid-1",
+                    categoria: "6º Ano - Química Básica",
+                    titulo: "Substâncias e Misturas",
+                    video: "https://www.youtube.com/embed/hbwKwNhIFM4",
+                    descricao: "Introdução à Química, matéria, objetos e substâncias.",
+                },
+                {
+                    id: "vid-2",
+                    categoria: "6º Ano - Química Básica",
+                    titulo: "Tipos de Misturas",
+                    video: "https://www.youtube.com/embed/L7cfPRNIfxQ",
+                    descricao: "Misturas homogêneas e heterogêneas.",
+                },
+                {
+                    id: "vid-3",
+                    categoria: "6º Ano - Química Básica",
+                    titulo: "Mistura Homogênea e Heterogênea",
+                    video: "https://www.youtube.com/embed/2zU_3ganVj4",
+                    descricao: "Diferenças entre tipos de misturas.",
+                },
+                {
+                    id: "vid-4",
+                    categoria: "7º Ano - Átomos",
+                    titulo: "Estrutura Atômica",
+                    video: "https://www.youtube.com/embed/jPL78QD6hBk",
+                    descricao: "Como é formado o átomo?",
+                },
+                {
+                    id: "vid-5",
+                    categoria: "7º Ano - Átomos",
+                    titulo: "Prótons, Nêutrons e Elétrons",
+                    video: "https://www.youtube.com/embed/eav23HYcowI",
+                    descricao: "Partículas presentes no átomo.",
+                },
+                {
+                    id: "vid-6",
+                    categoria: "8º Ano - Tabela Periódica e Ligações",
+                    titulo: "Tabela Periódica",
+                    video: "https://www.youtube.com/embed/Vsnq2hJ2UZc",
+                    descricao: "Famílias, períodos e elementos químicos.",
+                },
+                {
+                    id: "vid-7",
+                    categoria: "8º Ano - Tabela Periódica e Ligações",
+                    titulo: "Ligações Químicas",
+                    video: "https://www.youtube.com/embed/99b6_HneB64",
+                    descricao: "Formação de moléculas e ligações.",
+                },
+                {
+                    id: "vid-8",
+                    categoria: "9º Ano - Química Avançada",
+                    titulo: "Reações Químicas e Balanceamento",
+                    video: "https://www.youtube.com/embed/O9vPOw9dvM8",
+                    descricao: "Reagentes, produtos e equações químicas.",
+                },
+                {
+                    id: "vid-9",
+                    categoria: "9º Ano - Química Avançada",
+                    titulo: "Balanceamento de Equações",
+                    video: "https://www.youtube.com/embed/yF8o5vTOGc4",
+                    descricao: "Como equilibrar uma reação química.",
+                },
+                {
+                    id: "vid-10",
+                    categoria: "Ensino Médio",
+                    titulo: "Modelos Atômicos",
+                    video: "https://www.youtube.com/embed/5-fa4IKp5bU",
+                    descricao: "Modelos atômicos e evolução da ciência.",
+                },
+                {
+                    id: "vid-11",
+                    categoria: "Ensino Médio",
+                    titulo: "Termoquímica",
+                    video: "https://www.youtube.com/embed/Phr3DSKLLhA",
+                    descricao: "Energia nas reações químicas.",
+                },
+                {
+                    id: "vid-12",
+                    categoria: "Ensino Médio",
+                    titulo: "Eletroquímica",
+                    video: "https://www.youtube.com/embed/-RU1ywag0Dg",
+                    descricao: "Pilhas, eletrólise e oxirredução.",
+                },
+            ];
+
+            document.addEventListener("DOMContentLoaded", async function () {
+                await inicializarBancoVideos();
+                carregarVideos();
+                verificarEstadoProfessorInicial();
+            });
+
+            async function inicializarBancoVideos() {
+                try {
+                    let { data, error } = await supabaseClient.from("videos").select("*");
+                    if (error) {
+                        console.error("Erro ao verificar dados:", error.message);
+                        return;
+                    }
+                    if (!data || data.length === 0) {
+                        for (let v of videosPadrao) {
+                            await supabaseClient.from("videos").insert([v]);
+                        }
+                    }
+                } catch (e) {
+                    console.warn(
+                        "Usando dados locais de segurança devido a falha na conexão com o banco.",
+                    );
                 }
             }
-        } catch (e) {
-            console.warn("Usando dados locais de segurança devido a falha na conexão com o banco.");
-        }
-    }
 
-    async function verificarEstadoProfessorInicial() {
-        if (await verificarSeProfessor()) {
-            document.getElementById('btn-painel-toggle').style.background = '#16a34a';
-            document.getElementById('btn-painel-toggle').innerText = '🔓 Painel do Professor (Ativo)';
-            document.getElementById('btn-novo-vid').style.display = 'block';
-        } else {
-            document.getElementById('btn-novo-vid').style.display = 'none';
-        }
-    }
-
-    async function alternarPainelAdmin() {
-        let painel = document.getElementById('painel-admin');
-        
-        if (!(await verificarSeProfessor())) {
-            const logou = await loginViaPainel();
-            if (!logou) return;
-        }
-
-        painel.style.display = painel.style.display === "none" ? "block" : "none";
-    }
-
-    async function abrirPainelAdicionar() {
-        if (!(await verificarSeProfessor())) {
-            const logou = await loginViaPainel();
-            if (!logou) return;
-        }
-        let painel = document.getElementById('painel-admin');
-        painel.style.display = "block";
-        painel.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    async function sairModoProfessor() {
-        await logoutProfessor();
-    }
-
-    async function obterVideos() {
-        try {
-            let { data, error } = await supabaseClient.from('videos').select('*');
-            if (error || !data || data.length === 0) {
-                return videosPadrao;
+            async function verificarEstadoProfessorInicial() {
+                if (await verificarSeProfessor()) {
+                    document.getElementById("btn-painel-toggle").style.background = "#16a34a";
+                    document.getElementById("btn-painel-toggle").innerText =
+                        "🔓 Painel do Professor (Ativo)";
+                    document.getElementById("btn-novo-vid").style.display = "block";
+                } else {
+                    document.getElementById("btn-novo-vid").style.display = "none";
+                }
             }
-            return data;
-        } catch (e) {
-            return videosPadrao;
-        }
-    }
 
-    async function carregarVideos() {
-        let containerPrincipal = document.getElementById('container-categorias-videos');
-        containerPrincipal.innerHTML = "";
-        let videos = await obterVideos();
-        let eProfessor = await verificarSeProfessor();
+            async function alternarPainelAdmin() {
+                let painel = document.getElementById("painel-admin");
 
-        let categoriasOrdem = [
-            '6º Ano - Química Básica',
-            '7º Ano - Átomos',
-            '8º Ano - Tabela Periódica e Ligações',
-            '9º Ano - Química Avançada',
-            'Ensino Médio'
-        ];
+                if (!(await verificarSeProfessor())) {
+                    const logou = await loginViaPainel();
+                    if (!logou) return;
+                }
 
-        categoriasOrdem.forEach(catNome => {
-            let videosDaCategoria = videos.filter(v => v.categoria === catNome);
-            if (videosDaCategoria.length === 0) return;
+                painel.style.display = painel.style.display === "none" ? "block" : "none";
+            }
 
-            let secao = document.createElement('section');
-            
-            let tituloSecao = document.createElement('h2');
-            tituloSecao.innerText = catNome;
-            tituloSecao.style.marginBottom = "10px";
-            tituloSecao.style.color = "white";
-            secao.appendChild(tituloSecao);
+            async function abrirPainelAdicionar() {
+                if (!(await verificarSeProfessor())) {
+                    const logou = await loginViaPainel();
+                    if (!logou) return;
+                }
+                let painel = document.getElementById("painel-admin");
+                painel.style.display = "block";
+                painel.scrollIntoView({ behavior: "smooth" });
+            }
 
-            let gridDiv = document.createElement('div');
-            gridDiv.className = 'container';
+            async function sairModoProfessor() {
+                await logoutProfessor();
+            }
 
-            videosDaCategoria.forEach(vid => {
-                let cardDiv = document.createElement('div');
-                cardDiv.className = "card";
+            async function obterVideos() {
+                try {
+                    let { data, error } = await supabaseClient.from("videos").select("*");
+                    if (error || !data || data.length === 0) {
+                        return videosPadrao;
+                    }
+                    return data;
+                } catch (e) {
+                    return videosPadrao;
+                }
+            }
 
-                let likes = localStorage.getItem(vid.id + '_likes') || '0';
-                let curtido = localStorage.getItem(vid.id + '_curtido') === 'true';
-                let corBtnCurtir = curtido ? '#dc2626' : '#2563eb';
-                let linkVideoEmbed = converterParaEmbed(vid.video);
+            async function carregarVideos() {
+                let containerPrincipal = document.getElementById("container-categorias-videos");
+                containerPrincipal.innerHTML = "";
+                let videos = await obterVideos();
+                let eProfessor = await verificarSeProfessor();
 
-                let botoesAdminHtml = eProfessor ? `
+                let categoriasOrdem = [
+                    "6º Ano - Química Básica",
+                    "7º Ano - Átomos",
+                    "8º Ano - Tabela Periódica e Ligações",
+                    "9º Ano - Química Avançada",
+                    "Ensino Médio",
+                ];
+
+                categoriasOrdem.forEach((catNome) => {
+                    let videosDaCategoria = videos.filter((v) => v.categoria === catNome);
+                    if (videosDaCategoria.length === 0) return;
+
+                    let secao = document.createElement("section");
+
+                    let tituloSecao = document.createElement("h2");
+                    tituloSecao.innerText = catNome;
+                    tituloSecao.style.marginBottom = "10px";
+                    tituloSecao.style.color = "white";
+                    secao.appendChild(tituloSecao);
+
+                    let gridDiv = document.createElement("div");
+                    gridDiv.className = "container";
+
+                    videosDaCategoria.forEach((vid) => {
+                        let cardDiv = document.createElement("div");
+                        cardDiv.className = "card";
+
+                        let likes = localStorage.getItem(vid.id + "_likes") || "0";
+                        let curtido = localStorage.getItem(vid.id + "_curtido") === "true";
+                        let corBtnCurtir = curtido ? "#dc2626" : "#2563eb";
+                        let linkVideoEmbed = converterParaEmbed(vid.video);
+
+                        let botoesAdminHtml = eProfessor
+                            ? `
                     <div>
                         <button onclick="editarVideo('${vid.id}')" style="background: #374151; color: white; border: none; padding: 2px 5px; border-radius: 3px; cursor: pointer; font-size: 11px;">✏️ Editar</button>
                         <button onclick="excluirVideo('${vid.id}')" style="background: #b91c1c; color: white; border: none; padding: 2px 5px; border-radius: 3px; cursor: pointer; font-size: 11px;">🗑️ Excluir</button>
                     </div>
-                ` : '';
+                `
+                            : "";
 
-                cardDiv.innerHTML = `
+                        cardDiv.innerHTML = `
                     <div>
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
                             <h3 style="margin-top: 0; margin-bottom: 6px; color: #fff; font-size: 16px;">${vid.titulo}</h3>
@@ -275,7 +515,7 @@
 
                         <iframe width="100%" height="180" src="${linkVideoEmbed}" style="border: none; border-radius: 4px;" allowfullscreen></iframe>
 
-                        <p style="margin-top: 8px; margin-bottom: 0; font-size: 14px;">${vid.descricao || ''}</p>
+                        <p style="margin-top: 8px; margin-bottom: 0; font-size: 14px;">${vid.descricao || ""}</p>
                     </div>
 
                     <div class="secao-comentarios-card">
@@ -291,177 +531,201 @@
                     </div>
                 `;
 
-                gridDiv.appendChild(cardDiv);
-                carregarComentariosDoCard(vid.id);
-            });
+                        gridDiv.appendChild(cardDiv);
+                        carregarComentariosDoCard(vid.id);
+                    });
 
-            secao.appendChild(gridDiv);
-            containerPrincipal.appendChild(secao);
-        });
-    }
-
-    async function salvarNovoVideo() {
-        let categoria = document.getElementById('novo-categoria').value;
-        let titulo = document.getElementById('novo-titulo').value.trim();
-        let video = document.getElementById('novo-link').value.trim();
-        let descricao = document.getElementById('novo-descricao').value.trim();
-
-        if (!titulo || !video) {
-            alert("Preencha pelo menos o Título e o Link do Vídeo!");
-            return;
-        }
-
-        let novoId = 'vid-' + new Date().getTime();
-        let { error } = await supabaseClient.from('videos').insert([{
-            id: novoId,
-            categoria: categoria,
-            titulo: titulo,
-            video: video,
-            descricao: descricao
-        }]);
-
-        if (error) {
-            alert("Erro ao salvar vídeo: " + error.message);
-            return;
-        }
-
-        document.getElementById('novo-titulo').value = '';
-        document.getElementById('novo-link').value = '';
-        document.getElementById('novo-descricao').value = '';
-        document.getElementById('painel-admin').style.display = 'none';
-
-        carregarVideos();
-    }
-
-    async function excluirVideo(idVid) {
-        if (!(await verificarSeProfessor())) {
-            const logou = await loginViaPainel();
-            if (!logou) return;
-        }
-
-        if (confirm("Tem certeza que deseja apagar este vídeo?")) {
-            await supabaseClient.from('videos').delete().eq('id', idVid);
-            carregarVideos();
-        }
-    }
-
-    async function editarVideo(idVid) {
-        if (!(await verificarSeProfessor())) {
-            const logou = await loginViaPainel();
-            if (!logou) return;
-        }
-
-        let { data } = await supabaseClient.from('videos').select('*').eq('id', idVid);
-        let vid = data ? data[0] : null;
-        if (!vid) return;
-
-        let novoTitulo = prompt("Edite o Título:", vid.titulo);
-        if (novoTitulo === null) return;
-        
-        let novoLink = prompt("Edite o Link do YouTube:", vid.video);
-        if (novoLink === null) return;
-        
-        let novaDescricao = prompt("Edite a Descrição:", vid.descricao);
-        if (novaDescricao === null) return;
-
-        await supabaseClient.from('videos').update({
-            titulo: novoTitulo,
-            video: novoLink,
-            descricao: novaDescricao
-        }).eq('id', idVid);
-
-        carregarVideos();
-    }
-
-    function curtir(idVid) {
-        let span = document.getElementById('likes-' + idVid);
-        let btn = document.getElementById('btn-' + idVid);
-        let atual = parseInt(span.innerText);
-        let curtido = btn.dataset.curtido === 'true';
-
-        if (curtido) {
-            atual -= 1;
-            btn.dataset.curtido = 'false';
-            btn.style.background = '#2563eb';
-        } else {
-            atual += 1;
-            btn.dataset.curtido = 'true';
-            btn.style.background = '#dc2626';
-        }
-
-        span.innerText = atual;
-        localStorage.setItem(idVid + '_likes', atual);
-        localStorage.setItem(idVid + '_curtido', btn.dataset.curtido);
-    }
-
-    async function comentar(idAutorElem, idInputElem, idVid) {
-        let inputAutor = document.getElementById(idAutorElem);
-        let inputTexto = document.getElementById(idInputElem);
-        
-        let autor = inputAutor.value.trim();
-        if (autor === "") autor = "Visitante";
-        
-        let texto = inputTexto.value.trim();
-        
-        if (texto !== "") {
-            let timestampAtual = new Date().getTime();
-            let { data } = await supabaseClient.from('comentarios_videos').insert([{
-                video_id: idVid,
-                autor: autor,
-                texto: texto,
-                timestamp: timestampAtual
-            }]).select();
-
-            if (data) {
-                recarregarListaComentarios(idVid);
-                inputTexto.value = "";
-                inputAutor.value = "";
-            }
-        }
-    }
-
-    async function editarComentario(idVid, dbId) {
-        let novoTexto = prompt("Edite seu comentário:");
-        if (novoTexto !== null && novoTexto.trim() !== "") {
-            await supabaseClient.from('comentarios_videos').update({ texto: novoTexto.trim() }).eq('id', dbId);
-            recarregarListaComentarios(idVid);
-        }
-    }
-
-    async function excluirComentario(idVid, dbId) {
-        if (!(await verificarSeProfessor())) {
-            alert("Apenas o Professor pode apagar comentários.");
-            return;
-        }
-
-        if (confirm("Tem certeza que deseja apagar este comentário?")) {
-            await supabaseClient.from('comentarios_videos').delete().eq('id', dbId);
-            recarregarListaComentarios(idVid);
-        }
-    }
-
-    async function carregarComentariosDoCard(idVid) {
-        let lista = document.getElementById('lista-' + idVid);
-        if (!lista) return;
-        lista.innerHTML = "";
-
-        try {
-            let { data: dadosSalvos } = await supabaseClient.from('comentarios_videos').select('*').eq('video_id', idVid).order('id', { ascending: true });
-            if (dadosSalvos) {
-                dadosSalvos.forEach((item) => {
-                    let autor = item.autor || "Visitante";
-                    let tempoFormatado = calcularTempoRelativo(item.timestamp || new Date().getTime());
-                    adicionarElementoComentario(lista, autor, item.texto, tempoFormatado, idVid, item.id);
+                    secao.appendChild(gridDiv);
+                    containerPrincipal.appendChild(secao);
                 });
             }
-        } catch (e) {
-        }
-    }
 
-    function recarregarListaComentarios(idVid) {
-        carregarComentariosDoCard(idVid);
-    }
-</script>
+            async function salvarNovoVideo() {
+                let categoria = document.getElementById("novo-categoria").value;
+                let titulo = document.getElementById("novo-titulo").value.trim();
+                let video = document.getElementById("novo-link").value.trim();
+                let descricao = document.getElementById("novo-descricao").value.trim();
 
-</body>
+                if (!titulo || !video) {
+                    alert("Preencha pelo menos o Título e o Link do Vídeo!");
+                    return;
+                }
+
+                let novoId = "vid-" + new Date().getTime();
+                let { error } = await supabaseClient.from("videos").insert([
+                    {
+                        id: novoId,
+                        categoria: categoria,
+                        titulo: titulo,
+                        video: video,
+                        descricao: descricao,
+                    },
+                ]);
+
+                if (error) {
+                    alert("Erro ao salvar vídeo: " + error.message);
+                    return;
+                }
+
+                document.getElementById("novo-titulo").value = "";
+                document.getElementById("novo-link").value = "";
+                document.getElementById("novo-descricao").value = "";
+                document.getElementById("painel-admin").style.display = "none";
+
+                carregarVideos();
+            }
+
+            async function excluirVideo(idVid) {
+                if (!(await verificarSeProfessor())) {
+                    const logou = await loginViaPainel();
+                    if (!logou) return;
+                }
+
+                if (confirm("Tem certeza que deseja apagar este vídeo?")) {
+                    await supabaseClient.from("videos").delete().eq("id", idVid);
+                    carregarVideos();
+                }
+            }
+
+            async function editarVideo(idVid) {
+                if (!(await verificarSeProfessor())) {
+                    const logou = await loginViaPainel();
+                    if (!logou) return;
+                }
+
+                let { data } = await supabaseClient.from("videos").select("*").eq("id", idVid);
+                let vid = data ? data[0] : null;
+                if (!vid) return;
+
+                let novoTitulo = prompt("Edite o Título:", vid.titulo);
+                if (novoTitulo === null) return;
+
+                let novoLink = prompt("Edite o Link do YouTube:", vid.video);
+                if (novoLink === null) return;
+
+                let novaDescricao = prompt("Edite a Descrição:", vid.descricao);
+                if (novaDescricao === null) return;
+
+                await supabaseClient
+                    .from("videos")
+                    .update({
+                        titulo: novoTitulo,
+                        video: novoLink,
+                        descricao: novaDescricao,
+                    })
+                    .eq("id", idVid);
+
+                carregarVideos();
+            }
+
+            function curtir(idVid) {
+                let span = document.getElementById("likes-" + idVid);
+                let btn = document.getElementById("btn-" + idVid);
+                let atual = parseInt(span.innerText);
+                let curtido = btn.dataset.curtido === "true";
+
+                if (curtido) {
+                    atual -= 1;
+                    btn.dataset.curtido = "false";
+                    btn.style.background = "#2563eb";
+                } else {
+                    atual += 1;
+                    btn.dataset.curtido = "true";
+                    btn.style.background = "#dc2626";
+                }
+
+                span.innerText = atual;
+                localStorage.setItem(idVid + "_likes", atual);
+                localStorage.setItem(idVid + "_curtido", btn.dataset.curtido);
+            }
+
+            async function comentar(idAutorElem, idInputElem, idVid) {
+                let inputAutor = document.getElementById(idAutorElem);
+                let inputTexto = document.getElementById(idInputElem);
+
+                let autor = inputAutor.value.trim();
+                if (autor === "") autor = "Visitante";
+
+                let texto = inputTexto.value.trim();
+
+                if (texto !== "") {
+                    let timestampAtual = new Date().getTime();
+                    let { data } = await supabaseClient
+                        .from("comentarios_videos")
+                        .insert([
+                            {
+                                video_id: idVid,
+                                autor: autor,
+                                texto: texto,
+                                timestamp: timestampAtual,
+                            },
+                        ])
+                        .select();
+
+                    if (data) {
+                        recarregarListaComentarios(idVid);
+                        inputTexto.value = "";
+                        inputAutor.value = "";
+                    }
+                }
+            }
+
+            async function editarComentario(idVid, dbId) {
+                let novoTexto = prompt("Edite seu comentário:");
+                if (novoTexto !== null && novoTexto.trim() !== "") {
+                    await supabaseClient
+                        .from("comentarios_videos")
+                        .update({ texto: novoTexto.trim() })
+                        .eq("id", dbId);
+                    recarregarListaComentarios(idVid);
+                }
+            }
+
+            async function excluirComentario(idVid, dbId) {
+                if (!(await verificarSeProfessor())) {
+                    alert("Apenas o Professor pode apagar comentários.");
+                    return;
+                }
+
+                if (confirm("Tem certeza que deseja apagar este comentário?")) {
+                    await supabaseClient.from("comentarios_videos").delete().eq("id", dbId);
+                    recarregarListaComentarios(idVid);
+                }
+            }
+
+            async function carregarComentariosDoCard(idVid) {
+                let lista = document.getElementById("lista-" + idVid);
+                if (!lista) return;
+                lista.innerHTML = "";
+
+                try {
+                    let { data: dadosSalvos } = await supabaseClient
+                        .from("comentarios_videos")
+                        .select("*")
+                        .eq("video_id", idVid)
+                        .order("id", { ascending: true });
+                    if (dadosSalvos) {
+                        dadosSalvos.forEach((item) => {
+                            let autor = item.autor || "Visitante";
+                            let tempoFormatado = calcularTempoRelativo(
+                                item.timestamp || new Date().getTime(),
+                            );
+                            adicionarElementoComentario(
+                                lista,
+                                autor,
+                                item.texto,
+                                tempoFormatado,
+                                idVid,
+                                item.id,
+                            );
+                        });
+                    }
+                } catch (e) {}
+            }
+
+            function recarregarListaComentarios(idVid) {
+                carregarComentariosDoCard(idVid);
+            }
+        </script>
+    </body>
 </html>

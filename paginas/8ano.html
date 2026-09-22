@@ -1,403 +1,567 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>8º Ano - Química</title>
+        <link rel="stylesheet" href="../css/style.css" />
 
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>8º Ano - Química</title>
-<link rel="stylesheet" href="../css/style.css">
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="../js/supabaseClient.js"></script>
+        <script src="../js/utils.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../js/supabaseClient.js"></script>
-<script src="../js/utils.js"></script>
-
-<style>
-    .modal-admin { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
-    .modal-content-admin { background: #1e2621; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; color: white; border: 1px solid #a3e4d7; text-align: left; font-family: Arial, sans-serif; max-height: 90vh; overflow-y: auto; box-sizing: border-box; }
-    .modal-content-admin input, .modal-content-admin textarea, .modal-content-admin select { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #555; background: #2a352f; color: white; box-sizing: border-box; }
-    .acoes-card { display: none !important; }
-    .card.modo-admin { position: relative; border: 2px dashed #00b4d8; padding-bottom: 20px; }
-    .card.modo-admin .acoes-card { display: flex !important; margin-top: 15px; gap: 8px; justify-content: center; }
-</style>
-</head>
-
-<body>
-
-<div id="barra-admin">
-    <span id="status-admin" style="color: #a3e4d7; font-weight: bold; margin-right: 15px;">🔒 Modo Visitante</span>
-    <div id="bloco-login" style="display: inline-block;">
-        <input type="email" id="email-prof" placeholder="E-mail do Professor">
-        <input type="password" id="senha-prof" placeholder="Senha">
-        <button onclick="entrarAdmin()" style="background: #00b4d8; color: white;">Entrar</button>
-    </div>
-    <div id="botoes-admin" style="display: none;">
-        <button onclick="abrirModalCard()" style="background: #28a745; color: white;">➕ Adicionar Card</button>
-        <button onclick="sairAdmin()" style="background: #dc3545; color: white; margin-left: 5px;">Sair</button>
-    </div>
-</div>
-
-<div id="modal-card" class="modal-admin">
-    <div class="modal-content-admin">
-        <h3 id="modal-titulo-modal" style="color: #a3e4d7; margin-top: 0;">Novo Conteúdo</h3>
-        <input type="hidden" id="card-id">
-        <label>Título do Card:</label>
-        <input type="text" id="card-titulo" placeholder="Ex: 📄 Apostila Aula 1">
-        <label>Descrição:</label>
-        <textarea id="card-texto" rows="3" placeholder="Explicação resumida..."></textarea>
-        <label>Tipo de Destino do Botão:</label>
-        <select id="card-link-select" onchange="tratarMudancaTipoLink()">
-            <option value="../conteudos/8ano/tabela-periodica.html">Trilha: Tabela Periódica</option>
-            <option value="../conteudos/8ano/ions.html">Trilha: Íons</option>
-            <option value="../conteudos/8ano/ligacoes-quimicas.html">Trilha: Ligações Químicas</option>
-            <option value="../quiz/quiz.html">Página de Quiz / Desafio</option>
-            <option value="tipo_pdf">📄 Link do PDF (Google Drive / Nuvem)</option>
-            <option value="tipo_externo">🌐 Site Externo (Link da Web)</option>
-        </select>
-        <div id="bloco-pdf" style="display: none;">
-            <label>Cole o link do PDF na nuvem:</label>
-            <input type="text" id="card-input-pdf" placeholder="https://drive.google.com/...">
-            <small style="color: #a3e4d7; display: block; margin-top: -10px; margin-bottom: 15px;">Dica: Suba o PDF no Google Drive ou OneDrive e cole o link público aqui.</small>
-        </div>
-        <div id="bloco-externo" style="display: none;">
-            <label>Endereço do Site:</label>
-            <input type="text" id="card-input-externo" placeholder="https://youtube.com">
-        </div>
-        <label>Texto do Botão:</label>
-        <input type="text" id="card-btn-texto" placeholder="Estudar">
-        <div style="text-align: right; margin-top: 10px;">
-            <button onclick="salvarCard()" style="background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">Salvar</button>
-            <button onclick="fecharModalCard()" style="background: #6c757d; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-left: 5px;">Cancelar</button>
-        </div>
-    </div>
-</div>
-
-<header>
-<div class="logo">
-    <a href="../index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px; color: inherit;">
-        <img src="../assets/imagens/logo/logo.png" alt="Logo Química com Professor Wendel">
-        <span>Química com Professor Wendel</span>
-    </a>
-</div>
-
-<nav>
-    <a href="../index.html">Início</a>
-    <a href="experimentos.html">Experimentos</a>
-    <a href="videos.html">Vídeos</a>
-    <a href="perguntas.html">Perguntas</a>
-    <a href="professor.html">Professor</a>
-    <a href="../sugestoes.html">Sugestões</a>
-</nav>
-</header>
-
-<section class="banner-paginas">
-<div>
-<h1>
-Química - 8º Ano
-</h1>
-<p>
-Aprenda sobre tabela periódica, ligações químicas e elementos.
-</p>
-</div>
-</section>
-
-<section>
-<h2>
-Conteúdos do 8º Ano
-</h2>
-
-<div class="container" id="container-cards">
-</div>
-</section>
-
-<footer>
-    <p>© 2026 - <a href="https://github.com/gustavohenrimerry" target="_blank" rel="noopener noreferrer">Desenvolvido por Gustavo</a></p>
-</footer>
-
-<script>
-    const cardsPadrao8Ano = [
-        {
-            titulo: '🧬 Tabela Periódica',
-            texto: 'Conheça os elementos químicos e suas características.',
-            btn_texto: 'Estudar',
-            btn_link: '../conteudos/8ano/tabela-periodica.html'
-        },
-        {
-            titulo: '⚛️ Íons',
-            texto: 'Aprenda sobre cargas elétricas dos átomos.',
-            btn_texto: 'Estudar',
-            btn_link: '../conteudos/8ano/ions.html'
-        },
-        {
-            titulo: '🔗 Ligações Químicas',
-            texto: 'Entenda como os átomos se unem.',
-            btn_texto: 'Estudar',
-            btn_link: '../conteudos/8ano/ligacoes-quimicas.html'
-        },
-        {
-            titulo: '❓ Quiz 8º Ano',
-            texto: 'Teste seus conhecimentos.',
-            btn_texto: 'Fazer Quiz',
-            btn_link: '../quiz/quiz.html'
-        }
-    ];
-
-    document.addEventListener("DOMContentLoaded", async () => {
-        await inicializarBancoCards8Ano();
-        await verificarSessaoInicial();
-        await carregarCardsSalvos();
-    });
-
-    async function inicializarBancoCards8Ano() {
-        try {
-            let { data, error } = await supabaseClient.from('conteudos_8ano').select('*');
-            if (error) {
-                console.error("Erro ao verificar dados:", error.message);
-                return;
+        <style>
+            .modal-admin {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 2000;
+                justify-content: center;
+                align-items: center;
             }
-            if (!data || data.length === 0) {
-                for (let card of cardsPadrao8Ano) {
-                    await supabaseClient.from('conteudos_8ano').insert([card]);
+            .modal-content-admin {
+                background: #1e2621;
+                padding: 30px;
+                border-radius: 12px;
+                width: 90%;
+                max-width: 500px;
+                color: white;
+                border: 1px solid #a3e4d7;
+                text-align: left;
+                font-family: Arial, sans-serif;
+                max-height: 90vh;
+                overflow-y: auto;
+                box-sizing: border-box;
+            }
+            .modal-content-admin input,
+            .modal-content-admin textarea,
+            .modal-content-admin select {
+                width: 100%;
+                padding: 10px;
+                margin-top: 5px;
+                margin-bottom: 15px;
+                border-radius: 6px;
+                border: 1px solid #555;
+                background: #2a352f;
+                color: white;
+                box-sizing: border-box;
+            }
+            .acoes-card {
+                display: none !important;
+            }
+            .card.modo-admin {
+                position: relative;
+                border: 2px dashed #00b4d8;
+                padding-bottom: 20px;
+            }
+            .card.modo-admin .acoes-card {
+                display: flex !important;
+                margin-top: 15px;
+                gap: 8px;
+                justify-content: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="barra-admin">
+            <span id="status-admin" style="color: #a3e4d7; font-weight: bold; margin-right: 15px">
+                🔒 Modo Visitante
+            </span>
+            <div id="bloco-login" style="display: inline-block">
+                <input type="email" id="email-prof" placeholder="E-mail do Professor" />
+                <input type="password" id="senha-prof" placeholder="Senha" />
+                <button onclick="entrarAdmin()" style="background: #00b4d8; color: white">
+                    Entrar
+                </button>
+            </div>
+            <div id="botoes-admin" style="display: none">
+                <button onclick="abrirModalCard()" style="background: #28a745; color: white">
+                    ➕ Adicionar Card
+                </button>
+                <button
+                    onclick="sairAdmin()"
+                    style="background: #dc3545; color: white; margin-left: 5px"
+                >
+                    Sair
+                </button>
+            </div>
+        </div>
+
+        <div id="modal-card" class="modal-admin">
+            <div class="modal-content-admin">
+                <h3 id="modal-titulo-modal" style="color: #a3e4d7; margin-top: 0">Novo Conteúdo</h3>
+                <input type="hidden" id="card-id" />
+                <label>Título do Card:</label>
+                <input type="text" id="card-titulo" placeholder="Ex: 📄 Apostila Aula 1" />
+                <label>Descrição:</label>
+                <textarea id="card-texto" rows="3" placeholder="Explicação resumida..."></textarea>
+                <label>Tipo de Destino do Botão:</label>
+                <select id="card-link-select" onchange="tratarMudancaTipoLink()">
+                    <option value="../conteudos/8ano/tabela-periodica.html">
+                        Trilha: Tabela Periódica
+                    </option>
+                    <option value="../conteudos/8ano/ions.html">Trilha: Íons</option>
+                    <option value="../conteudos/8ano/ligacoes-quimicas.html">
+                        Trilha: Ligações Químicas
+                    </option>
+                    <option value="../quiz/quiz.html">Página de Quiz / Desafio</option>
+                    <option value="tipo_pdf">📄 Link do PDF (Google Drive / Nuvem)</option>
+                    <option value="tipo_externo">🌐 Site Externo (Link da Web)</option>
+                </select>
+                <div id="bloco-pdf" style="display: none">
+                    <label>Cole o link do PDF na nuvem:</label>
+                    <input
+                        type="text"
+                        id="card-input-pdf"
+                        placeholder="https://drive.google.com/..."
+                    />
+                    <small
+                        style="
+                            color: #a3e4d7;
+                            display: block;
+                            margin-top: -10px;
+                            margin-bottom: 15px;
+                        "
+                    >
+                        Dica: Suba o PDF no Google Drive ou OneDrive e cole o link público aqui.
+                    </small>
+                </div>
+                <div id="bloco-externo" style="display: none">
+                    <label>Endereço do Site:</label>
+                    <input type="text" id="card-input-externo" placeholder="https://youtube.com" />
+                </div>
+                <label>Texto do Botão:</label>
+                <input type="text" id="card-btn-texto" placeholder="Estudar" />
+                <div style="text-align: right; margin-top: 10px">
+                    <button
+                        onclick="salvarCard()"
+                        style="
+                            background: #28a745;
+                            color: white;
+                            border: none;
+                            padding: 8px 15px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-weight: bold;
+                        "
+                    >
+                        Salvar
+                    </button>
+                    <button
+                        onclick="fecharModalCard()"
+                        style="
+                            background: #6c757d;
+                            color: white;
+                            border: none;
+                            padding: 8px 15px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            margin-left: 5px;
+                        "
+                    >
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <header>
+            <div class="logo">
+                <a
+                    href="../index.html"
+                    style="
+                        text-decoration: none;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        color: inherit;
+                    "
+                >
+                    <img
+                        src="../assets/imagens/logo/logo.png"
+                        alt="Logo Química com Professor Wendel"
+                    />
+                    <span>Química com Professor Wendel</span>
+                </a>
+            </div>
+
+            <nav>
+                <a href="../index.html">Início</a>
+                <a href="experimentos.html">Experimentos</a>
+                <a href="videos.html">Vídeos</a>
+                <a href="perguntas.html">Perguntas</a>
+                <a href="professor.html">Professor</a>
+                <a href="../sugestoes.html">Sugestões</a>
+            </nav>
+        </header>
+
+        <section class="banner-paginas">
+            <div>
+                <h1>Química - 8º Ano</h1>
+                <p>Aprenda sobre tabela periódica, ligações químicas e elementos.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 style="color: white">Conteúdos do 8º Ano</h2>
+
+            <div class="container" id="container-cards"></div>
+        </section>
+
+        <footer>
+            <p>
+                © 2026 -
+                <a
+                    href="https://github.com/gustavohenrimerry"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Desenvolvido por Gustavo
+                </a>
+            </p>
+        </footer>
+
+        <script>
+            const cardsPadrao8Ano = [
+                {
+                    titulo: "🧬 Tabela Periódica",
+                    texto: "Conheça os elementos químicos e suas características.",
+                    btn_texto: "Estudar",
+                    btn_link: "../conteudos/8ano/tabela-periodica.html",
+                },
+                {
+                    titulo: "⚛️ Íons",
+                    texto: "Aprenda sobre cargas elétricas dos átomos.",
+                    btn_texto: "Estudar",
+                    btn_link: "../conteudos/8ano/ions.html",
+                },
+                {
+                    titulo: "🔗 Ligações Químicas",
+                    texto: "Entenda como os átomos se unem.",
+                    btn_texto: "Estudar",
+                    btn_link: "../conteudos/8ano/ligacoes-quimicas.html",
+                },
+                {
+                    titulo: "❓ Quiz 8º Ano",
+                    texto: "Teste seus conhecimentos.",
+                    btn_texto: "Fazer Quiz",
+                    btn_link: "../quiz/quiz.html",
+                },
+            ];
+
+            document.addEventListener("DOMContentLoaded", async () => {
+                await inicializarBancoCards8Ano();
+                await verificarSessaoInicial();
+                await carregarCardsSalvos();
+            });
+
+            async function inicializarBancoCards8Ano() {
+                try {
+                    let { data, error } = await supabaseClient.from("conteudos_8ano").select("*");
+                    if (error) {
+                        console.error("Erro ao verificar dados:", error.message);
+                        return;
+                    }
+                    if (!data || data.length === 0) {
+                        for (let card of cardsPadrao8Ano) {
+                            await supabaseClient.from("conteudos_8ano").insert([card]);
+                        }
+                    }
+                } catch (e) {
+                    console.log("Modo offline ativado para os cards do 8º ano.");
                 }
             }
-        } catch (e) {
-            console.log("Modo offline ativado para os cards do 8º ano.");
-        }
-    }
 
-    async function verificarSessaoInicial() {
-        try {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
+            async function verificarSessaoInicial() {
+                try {
+                    const {
+                        data: { session },
+                    } = await supabaseClient.auth.getSession();
+                    if (session) {
+                        ativarInterfaceAdmin();
+                    }
+                } catch (e) {
+                    console.log("Sessão não verificada.");
+                }
+            }
+
+            async function entrarAdmin() {
+                const email = document.getElementById("email-prof").value.trim();
+                const senha = document.getElementById("senha-prof").value;
+
+                if (!email || !senha) {
+                    alert("Preencha o e-mail e a senha!");
+                    return;
+                }
+
+                let { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email,
+                    password: senha,
+                });
+                if (error) {
+                    alert("Erro ao entrar: " + error.message);
+                    return;
+                }
                 ativarInterfaceAdmin();
+                window.location.reload();
             }
-        } catch (e) {
-            console.log("Sessão não verificada.");
-        }
-    }
 
-    async function entrarAdmin() {
-        const email = document.getElementById('email-prof').value.trim();
-        const senha = document.getElementById('senha-prof').value;
-
-        if (!email || !senha) {
-            alert("Preencha o e-mail e a senha!");
-            return;
-        }
-
-        let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
-        if (error) {
-            alert("Erro ao entrar: " + error.message);
-            return;
-        }
-        ativarInterfaceAdmin();
-        window.location.reload();
-    }
-
-    async function sairAdmin() {
-        await supabaseClient.auth.signOut();
-        window.location.reload();
-    }
-
-    function ativarInterfaceAdmin() {
-        document.getElementById('status-admin').innerText = "🔓 Modo Professor Ativo";
-        document.getElementById('bloco-login').style.display = 'none';
-        document.getElementById('botoes-admin').style.display = 'inline-block';
-    }
-
-    function tratarMudancaTipoLink() {
-        const select = document.getElementById('card-link-select').value;
-        const blocoPdf = document.getElementById('bloco-pdf');
-        const blocoExterno = document.getElementById('bloco-externo');
-        const btnTextoInput = document.getElementById('card-btn-texto');
-
-        blocoPdf.style.display = 'none';
-        blocoExterno.style.display = 'none';
-
-        if (select === 'tipo_pdf') {
-            blocoPdf.style.display = 'block';
-            btnTextoInput.value = "Baixar PDF";
-        } else if (select === 'tipo_externo') {
-            blocoExterno.style.display = 'block';
-            btnTextoInput.value = "Acessar Site";
-        } else {
-            if (select.includes("quiz")) btnTextoInput.value = "Fazer Quiz";
-            else btnTextoInput.value = "Estudar";
-        }
-    }
-
-    function abrirModalCard(id = "", titulo = "", texto = "", linkAtual = "", btnTextoAtual = "") {
-        document.getElementById('card-id').value = id;
-        document.getElementById('card-titulo').value = titulo;
-        document.getElementById('card-texto').value = texto;
-        document.getElementById('card-btn-texto').value = btnTextoAtual || "Estudar";
-        
-        const select = document.getElementById('card-link-select');
-        const inputPdf = document.getElementById('card-input-pdf');
-        const inputExterno = document.getElementById('card-input-externo');
-        
-        document.getElementById('bloco-pdf').style.display = 'none';
-        document.getElementById('bloco-externo').style.display = 'none';
-
-        let encontrou = false;
-        for (let i = 0; i < select.options.length; i++) {
-            if (select.options[i].value === linkAtual) {
-                select.selectedIndex = i;
-                encontrou = true;
-                break;
+            async function sairAdmin() {
+                await supabaseClient.auth.signOut();
+                window.location.reload();
             }
-        }
-        
-        if (!encontrou && linkAtual) {
-            if (linkAtual.includes('drive.google.com') || linkAtual.includes('onedrive') || linkAtual.includes('dropbox') || linkAtual.toLowerCase().includes('.pdf')) {
-                select.value = 'tipo_pdf';
-                inputPdf.value = linkAtual;
-                document.getElementById('bloco-pdf').style.display = 'block';
-            } else {
-                select.value = 'tipo_externo';
-                inputExterno.value = linkAtual;
-                document.getElementById('bloco-externo').style.display = 'block';
+
+            function ativarInterfaceAdmin() {
+                document.getElementById("status-admin").innerText = "🔓 Modo Professor Ativo";
+                document.getElementById("bloco-login").style.display = "none";
+                document.getElementById("botoes-admin").style.display = "inline-block";
             }
-        }
-        
-        document.getElementById('modal-titulo-modal').innerText = id ? "Editar Conteúdo" : "Adicionar Novo Conteúdo";
-        document.getElementById('modal-card').style.display = "flex";
-    }
 
-    function fecharModalCard() {
-        document.getElementById('modal-card').style.display = "none";
-    }
+            function tratarMudancaTipoLink() {
+                const select = document.getElementById("card-link-select").value;
+                const blocoPdf = document.getElementById("bloco-pdf");
+                const blocoExterno = document.getElementById("bloco-externo");
+                const btnTextoInput = document.getElementById("card-btn-texto");
 
-    async function salvarCard() {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) {
-            alert("Acesso restrito ao professor.");
-            return;
-        }
+                blocoPdf.style.display = "none";
+                blocoExterno.style.display = "none";
 
-        const id = document.getElementById('card-id').value;
-        const titulo = document.getElementById('card-titulo').value.trim();
-        const texto = document.getElementById('card-texto').value.trim();
-        let btn_texto = document.getElementById('card-btn-texto').value.trim() || "Estudar";
-        
-        const selectVal = document.getElementById('card-link-select').value;
-        let btn_link = "";
-
-        if (selectVal === 'tipo_pdf') {
-            btn_link = document.getElementById('card-input-pdf').value.trim();
-            if (!btn_link) {
-                alert("Cole o link do PDF!");
-                return;
+                if (select === "tipo_pdf") {
+                    blocoPdf.style.display = "block";
+                    btnTextoInput.value = "Baixar PDF";
+                } else if (select === "tipo_externo") {
+                    blocoExterno.style.display = "block";
+                    btnTextoInput.value = "Acessar Site";
+                } else {
+                    if (select.includes("quiz")) btnTextoInput.value = "Fazer Quiz";
+                    else btnTextoInput.value = "Estudar";
+                }
             }
-        } else if (selectVal === 'tipo_externo') {
-            btn_link = document.getElementById('card-input-externo').value.trim();
-            if (!btn_link) {
-                alert("Digite o endereço do site externo!");
-                return;
+
+            function abrirModalCard(
+                id = "",
+                titulo = "",
+                texto = "",
+                linkAtual = "",
+                btnTextoAtual = "",
+            ) {
+                document.getElementById("card-id").value = id;
+                document.getElementById("card-titulo").value = titulo;
+                document.getElementById("card-texto").value = texto;
+                document.getElementById("card-btn-texto").value = btnTextoAtual || "Estudar";
+
+                const select = document.getElementById("card-link-select");
+                const inputPdf = document.getElementById("card-input-pdf");
+                const inputExterno = document.getElementById("card-input-externo");
+
+                document.getElementById("bloco-pdf").style.display = "none";
+                document.getElementById("bloco-externo").style.display = "none";
+
+                let encontrou = false;
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value === linkAtual) {
+                        select.selectedIndex = i;
+                        encontrou = true;
+                        break;
+                    }
+                }
+
+                if (!encontrou && linkAtual) {
+                    if (
+                        linkAtual.includes("drive.google.com") ||
+                        linkAtual.includes("onedrive") ||
+                        linkAtual.includes("dropbox") ||
+                        linkAtual.toLowerCase().includes(".pdf")
+                    ) {
+                        select.value = "tipo_pdf";
+                        inputPdf.value = linkAtual;
+                        document.getElementById("bloco-pdf").style.display = "block";
+                    } else {
+                        select.value = "tipo_externo";
+                        inputExterno.value = linkAtual;
+                        document.getElementById("bloco-externo").style.display = "block";
+                    }
+                }
+
+                document.getElementById("modal-titulo-modal").innerText = id
+                    ? "Editar Conteúdo"
+                    : "Adicionar Novo Conteúdo";
+                document.getElementById("modal-card").style.display = "flex";
             }
-        } else {
-            btn_link = selectVal;
-        }
 
-        if (!titulo || !texto) {
-            alert("Preencha o título e a descrição do card!");
-            return;
-        }
-
-        if (id) {
-            let { error } = await supabaseClient.from('conteudos_8ano').update({
-                titulo, texto, btn_texto, btn_link
-            }).eq('id', id);
-
-            if (error) {
-                alert("Erro ao atualizar: " + error.message);
-                return;
+            function fecharModalCard() {
+                document.getElementById("modal-card").style.display = "none";
             }
-        } else {
-            let { error } = await supabaseClient.from('conteudos_8ano').insert([{
-                titulo, texto, btn_texto, btn_link
-            }]);
 
-            if (error) {
-                alert("Erro ao salvar: " + error.message);
-                return;
+            async function salvarCard() {
+                const {
+                    data: { session },
+                } = await supabaseClient.auth.getSession();
+                if (!session) {
+                    alert("Acesso restrito ao professor.");
+                    return;
+                }
+
+                const id = document.getElementById("card-id").value;
+                const titulo = document.getElementById("card-titulo").value.trim();
+                const texto = document.getElementById("card-texto").value.trim();
+                let btn_texto = document.getElementById("card-btn-texto").value.trim() || "Estudar";
+
+                const selectVal = document.getElementById("card-link-select").value;
+                let btn_link = "";
+
+                if (selectVal === "tipo_pdf") {
+                    btn_link = document.getElementById("card-input-pdf").value.trim();
+                    if (!btn_link) {
+                        alert("Cole o link do PDF!");
+                        return;
+                    }
+                } else if (selectVal === "tipo_externo") {
+                    btn_link = document.getElementById("card-input-externo").value.trim();
+                    if (!btn_link) {
+                        alert("Digite o endereço do site externo!");
+                        return;
+                    }
+                } else {
+                    btn_link = selectVal;
+                }
+
+                if (!titulo || !texto) {
+                    alert("Preencha o título e a descrição do card!");
+                    return;
+                }
+
+                if (id) {
+                    let { error } = await supabaseClient
+                        .from("conteudos_8ano")
+                        .update({
+                            titulo,
+                            texto,
+                            btn_texto,
+                            btn_link,
+                        })
+                        .eq("id", id);
+
+                    if (error) {
+                        alert("Erro ao atualizar: " + error.message);
+                        return;
+                    }
+                } else {
+                    let { error } = await supabaseClient.from("conteudos_8ano").insert([
+                        {
+                            titulo,
+                            texto,
+                            btn_texto,
+                            btn_link,
+                        },
+                    ]);
+
+                    if (error) {
+                        alert("Erro ao salvar: " + error.message);
+                        return;
+                    }
+                }
+
+                fecharModalCard();
+                carregarCardsSalvos();
             }
-        }
-        
-        fecharModalCard();
-        carregarCardsSalvos();
-    }
 
-    async function carregarCardsSalvos() {
-        const container = document.getElementById('container-cards');
-        container.innerHTML = "";
+            async function carregarCardsSalvos() {
+                const container = document.getElementById("container-cards");
+                container.innerHTML = "";
 
-        let customizados = [];
-        try {
-            let { data, error } = await supabaseClient.from('conteudos_8ano').select('*').order('id', { ascending: true });
-            if (!error && data && data.length > 0) {
-                customizados = data;
-            } else {
-                customizados = cardsPadrao8Ano;
-            }
-        } catch (e) {
-            customizados = cardsPadrao8Ano;
-        }
+                let customizados = [];
+                try {
+                    let { data, error } = await supabaseClient
+                        .from("conteudos_8ano")
+                        .select("*")
+                        .order("id", { ascending: true });
+                    if (!error && data && data.length > 0) {
+                        customizados = data;
+                    } else {
+                        customizados = cardsPadrao8Ano;
+                    }
+                } catch (e) {
+                    customizados = cardsPadrao8Ano;
+                }
 
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        let modoAdminAtivo = !!session;
+                const {
+                    data: { session },
+                } = await supabaseClient.auth.getSession();
+                let modoAdminAtivo = !!session;
 
-        customizados.forEach(item => {
-            let linkDestino = item.btn_link || '#';
-            let deveAbrirNovaAba = linkDestino.startsWith('http') || linkDestino.toLowerCase().includes('.pdf');
-            let targetAttr = deveAbrirNovaAba ? 'target="_blank"' : '';
+                customizados.forEach((item) => {
+                    let linkDestino = item.btn_link || "#";
+                    let deveAbrirNovaAba =
+                        linkDestino.startsWith("http") ||
+                        linkDestino.toLowerCase().includes(".pdf");
+                    let targetAttr = deveAbrirNovaAba ? 'target="_blank"' : "";
 
-            const div = document.createElement('div');
-            div.className = 'card';
-            if (modoAdminAtivo) div.classList.add('modo-admin');
-            if (item.id) div.setAttribute('data-id', item.id);
+                    const div = document.createElement("div");
+                    div.className = "card";
+                    if (modoAdminAtivo) div.classList.add("modo-admin");
+                    if (item.id) div.setAttribute("data-id", item.id);
 
-            let acoesHtml = modoAdminAtivo && item.id ? `
+                    let acoesHtml =
+                        modoAdminAtivo && item.id
+                            ? `
                 <div class="acoes-card" style="display: flex !important;">
-                    <button onclick="editarItem('${item.id}', '${encodeURIComponent(item.titulo)}', '${encodeURIComponent(item.texto)}', '${encodeURIComponent(linkDestino)}', '${encodeURIComponent(item.btn_texto || item.btn_text || 'Estudar')}')" style="background: #ffc107; color: black; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">✏️ Editar</button>
+                    <button onclick="editarItem('${item.id}', '${encodeURIComponent(item.titulo)}', '${encodeURIComponent(item.texto)}', '${encodeURIComponent(linkDestino)}', '${encodeURIComponent(item.btn_texto || item.btn_text || "Estudar")}')" style="background: #ffc107; color: black; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">✏️ Editar</button>
                     <button onclick="excluirItem('${item.id}')" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">🗑️ Excluir</button>
                 </div>
-            ` : '';
+            `
+                            : "";
 
-            div.innerHTML = `
+                    div.innerHTML = `
                 <div>
-                    <h3>${item.titulo}</h3>
+                    <h3 style="color: #80ef80">${item.titulo}</h3>
                     <p>${item.texto}</p>
                 </div>
                 <div>
-                    <a href="${linkDestino}" ${targetAttr} style="display: inline-block; margin-top: 10px;">${item.btn_texto || item.btn_text || 'Estudar'}</a>
+                    <a href="${linkDestino}" ${targetAttr} style="display: inline-block; margin-top: 10px;">${item.btn_texto || item.btn_text || "Estudar"}</a>
                     ${acoesHtml}
                 </div>
             `;
-            container.appendChild(div);
-        });
-    }
-
-    function editarItem(id, titulo, texto, link, btnTexto) {
-        abrirModalCard(id, decodeURIComponent(titulo), decodeURIComponent(texto), decodeURIComponent(link), decodeURIComponent(btnTexto));
-    }
-
-    async function excluirItem(id) {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) {
-            alert("Acesso restrito ao professor.");
-            return;
-        }
-
-        if (confirm("Deseja realmente excluir este card?")) {
-            let { error } = await supabaseClient.from('conteudos_8ano').delete().eq('id', id);
-            if (error) {
-                alert("Erro ao excluir: " + error.message);
-                return;
+                    container.appendChild(div);
+                });
             }
-            carregarCardsSalvos();
-        }
-    }
-</script>
 
-</body>
+            function editarItem(id, titulo, texto, link, btnTexto) {
+                abrirModalCard(
+                    id,
+                    decodeURIComponent(titulo),
+                    decodeURIComponent(texto),
+                    decodeURIComponent(link),
+                    decodeURIComponent(btnTexto),
+                );
+            }
+
+            async function excluirItem(id) {
+                const {
+                    data: { session },
+                } = await supabaseClient.auth.getSession();
+                if (!session) {
+                    alert("Acesso restrito ao professor.");
+                    return;
+                }
+
+                if (confirm("Deseja realmente excluir este card?")) {
+                    let { error } = await supabaseClient
+                        .from("conteudos_8ano")
+                        .delete()
+                        .eq("id", id);
+                    if (error) {
+                        alert("Erro ao excluir: " + error.message);
+                        return;
+                    }
+                    carregarCardsSalvos();
+                }
+            }
+        </script>
+    </body>
 </html>
