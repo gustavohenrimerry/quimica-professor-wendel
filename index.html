@@ -1,251 +1,606 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Química com Professor Wendel</title>
+        <link rel="stylesheet" href="css/style.css" />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Química com Professor Wendel</title>
-    <link rel="stylesheet" href="css/style.css">
+        <script
+            type="module"
+            src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
+        ></script>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="js/supabaseClient.js"></script>
+        <script src="js/utils.js"></script>
+    </head>
 
-    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabaseClient.js"></script>
-    <script src="js/utils.js"></script>
-</head>
-
-<body>
-
-<div id="barra-admin">
-    <span id="status-admin" style="color: #a3e4d7; font-weight: bold; margin-right: 15px;">🔒 Modo Visitante</span>
-    <div id="bloco-login" style="display: inline-block;">
-        <input type="email" id="email-prof" placeholder="E-mail do Professor" style="width: 180px;">
-        <input type="password" id="senha-prof" placeholder="Senha" style="width: 140px;">
-        <button onclick="entrarAdmin()" style="background: #00b4d8; color: white;">Entrar</button>
-    </div>
-    <div id="botoes-admin" style="display: none;">
-        <button onclick="abrirModalCuriosidade()" style="background: #28a745; color: white;">➕ Adicionar Curiosidade</button>
-        <button onclick="sairAdmin()" style="background: #dc3545; color: white; margin-left: 5px;">Sair</button>
-    </div>
-</div>
-
-<div id="modal-curiosidade" class="modal-admin">
-    <div class="modal-content-admin">
-        <h3 id="modal-titulo-curiosidade" style="color: #a3e4d7; margin-top: 0;">Nova Curiosidade</h3>
-        <input type="hidden" id="curiosidade-id">
-        
-        <label>Título:</label>
-        <input type="text" id="curiosidade-titulo" placeholder="Título da curiosidade">
-        
-        <label>Texto / Descrição:</label>
-        <textarea id="curiosidade-texto" rows="4" placeholder="Escreva a explicação..."></textarea>
-        
-        <label>Foto do Computador:</label>
-        <input type="file" id="curiosidade-foto" accept="image/*">
-        
-        <div style="text-align: right; margin-top: 10px;">
-            <button onclick="salvarCuriosidade()" style="background: #28a745; color: white;">Salvar</button>
-            <button onclick="fecharModalCuriosidade()" style="background: #6c757d; color: white; margin-left: 5px;">Cancelar</button>
+    <body>
+        <div id="barra-admin">
+            <span id="status-admin" style="color: #a3e4d7; font-weight: bold; margin-right: 15px">
+                🔒 Modo Visitante
+            </span>
+            <div id="bloco-login" style="display: inline-block">
+                <input
+                    type="email"
+                    id="email-prof"
+                    placeholder="E-mail do Professor"
+                    style="width: 180px"
+                />
+                <input type="password" id="senha-prof" placeholder="Senha" style="width: 140px" />
+                <button onclick="entrarAdmin()" style="background: #00b4d8; color: white">
+                    Entrar
+                </button>
+            </div>
+            <div id="botoes-admin" style="display: none">
+                <button onclick="abrirModalCuriosidade()" style="background: #28a745; color: white">
+                    ➕ Adicionar Curiosidade
+                </button>
+                <button
+                    onclick="sairAdmin()"
+                    style="background: #dc3545; color: white; margin-left: 5px"
+                >
+                    Sair
+                </button>
+            </div>
         </div>
-    </div>
-</div>
 
-<header>
-    <div class="logo">
-        <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px; color: inherit;">  
-        <img src="assets/imagens/logo/logo.png" alt="Logo Química com Professor Wendel">
-        Química com Professor Wendel
-    </div>
+        <div id="modal-curiosidade" class="modal-admin">
+            <div class="modal-content-admin">
+                <h3 id="modal-titulo-curiosidade" style="color: #a3e4d7; margin-top: 0">
+                    Nova Curiosidade
+                </h3>
+                <input type="hidden" id="curiosidade-id" />
 
-    <nav>
-        <a href="index.html">Início</a>
-        <a href="paginas/experimentos.html">Experimentos</a>
-        <a href="paginas/videos.html">Vídeos</a>
-        <a href="paginas/perguntas.html">Perguntas</a>
-        <a href="paginas/professor.html">Professor</a>
-        <a href="sugestoes.html">Sugestões</a>
-    </nav>
-</header>
+                <label>Título:</label>
+                <input type="text" id="curiosidade-titulo" placeholder="Título da curiosidade" />
 
-<section class="banner-home">
-    <model-viewer 
-        class="molecula-lateral"
-        src="quiz/molecule.glb" 
-        auto-rotate 
-        rotation-per-second="30deg"
-        auto-rotate-delay="1000"
-        camera-controls 
-        interaction-policy="allow-when-focused"
-        camera-orbit="0deg 75deg 105%"
-        environment-image="neutral"
-        exposure="1.2"
-        shadow-intensity="1"
-        style="min-width: 400px; min-height: 400px; z-index: 10;display: block;background: transparent;border: none;flex-shrink: 0;">
-    </model-viewer>
+                <label>Texto / Descrição:</label>
+                <textarea
+                    id="curiosidade-texto"
+                    rows="4"
+                    placeholder="Escreva a explicação..."
+                ></textarea>
 
-    <div>
-        <h1>Aprenda Química de um jeito simples e divertido</h1>
-        <p>Conteúdos, experimentos, videos e quizzes para ajudar estudantes do 6º ano até o Ensino Médio.</p>
-        <a class="botao" href="#series">Escolher minha série</a>
-    </div>
+                <label>Foto do Computador:</label>
+                <input type="file" id="curiosidade-foto" accept="image/*" />
 
-    <div class="emojis-laterais">
-        <span>⚗️</span>
-        <span>🧬</span>
-    </div>
-</section>
-
-<section class="sobre">
-    <h2>Bem-vindo ao laboratório virtual do Professor Wendel</h2>
-    <p>Aqui você encontra aulas de Química, explicações, curiosidades, experimentos seguros e desafios para testar seus conhecimentos.</p>
-</section>
-
-<section class="cards">
-    <h2>Conteúdos do site</h2>
-    <div class="container">
-        <div class="card">
-            <img src="assets/imagens/experimentos/experimento1.jpg" alt="Experimento de Química" style="width: 100%; height: 150px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-            <h3>🧪 Experimentos</h3>
-            <p>Veja experiências de Química explicadas passo a passo.</p>
-            <a href="paginas/experimentos.html">Ver experimentos</a>
+                <div style="text-align: right; margin-top: 10px">
+                    <button onclick="salvarCuriosidade()" style="background: #28a745; color: white">
+                        Salvar
+                    </button>
+                    <button
+                        onclick="fecharModalCuriosidade()"
+                        style="background: #6c757d; color: white; margin-left: 5px"
+                    >
+                        Cancelar
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="card">
-            <img src="assets/imagens/experimentos/videos.jpg" alt="Vídeos de Aulas de Química" style="width: 100%; height: 150px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-            <h3>🎥 Vídeos</h3>
-            <p>Aulas e experiências usando vídeos do YouTube.</p>
-            <a href="paginas/videos.html">Assistir vídeos</a>
-        </div>
-        <div class="card">
-            <img src="assets/imagens/experimentos/perguntas.jpg" alt="Perguntas e Quizzes de Química" style="width: 100%; height: 150px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-            <h3>❓ Perguntas</h3>
-            <p>Teste seus conhecimentos com perguntas de Química.</p>
-            <a href="paginas/perguntas.html">Ver perguntas</a>
-        </div>
-    </div>
-</section>
 
-<section id="series" class="series">
-    <h2>Escolha sua série</h2>
-    <div class="container">
-        <a href="paginas/6ano.html">6º Ano</a>
-        <a href="paginas/7ano.html">7º Ano</a>
-        <a href="paginas/8ano.html">8º Ano</a>
-        <a href="paginas/9ano.html">9º Ano</a>
-        <a href="paginas/1serie.html">1ª Série</a>
-        <a href="paginas/2serie.html">2ª Série</a>
-        <a href="paginas/3serie.html">3ª Série</a>
-    </div>
-</section>
+        <header>
+            <div class="logo">
+                <a
+                    href="index.html"
+                    style="
+                        text-decoration: none;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        color: inherit;
+                    "
+                >
+                    <img
+                        src="assets/imagens/logo/logo.png"
+                        alt="Logo Química com Professor Wendel"
+                    />
+                    Química com Professor Wendel
+                </a>
+            </div>
 
-<section class="blog" id="secao-blog">
-    <h2>Curiosidades de Química</h2>
-    
-    <article data-id="1">
-        <img src="assets/imagens/blog/vulcao.jpg" alt="Vulcão de bicarbonato" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>Por que o vulcão de bicarbonato acontece?</h3>
-        <p>Uma reação química entre bicarbonato de sódio e vinagre produz gás carbônico, causando a famosa espuma.</p>
-    </article>
-    <article data-id="2">
-        <img src="assets/imagens/blog/banana.jpg" alt="Bananas" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>2. O Ouro do Bananal</h3>
-        <p>As bananas contêm bastante potássio, incluindo o potássio-40, que é radioativo de forma natural e inofensiva.</p>
-    </article>
-    <article data-id="3">
-        <img src="assets/imagens/blog/mercurio.jpg" alt="Mercúrio Líquido" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>3. O Metal Líquido</h3>
-        <p>O mercúrio é o único metal da tabela periódica que se mantém no estado líquido à temperatura ambiente.</p>
-    </article>
-    <article data-id="4">
-        <img src="assets/imagens/blog/cebola.jpg" alt="Cebola" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>4. Por que a Cebola Chora?</h3>
-        <p>Ao cortar a cebola, rompem-se células que liberam ácidos e enzimas, formando um gás volátil que irrita os olhos.</p>
-    </article>
-    <article data-id="5">
-        <img src="assets/imagens/blog/carbono.jpg" alt="Diamante e Grafite" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>5. Diamante e Grafite</h3>
-        <p>Tanto o diamante precioso quanto o grafite do lápis são formados puramente por átomos de carbono, mudando apenas a estrutura.</p>
-    </article>
-    <article data-id="6">
-        <img src="assets/imagens/blog/geloagua.jpg" alt="Gelo flutuando na água" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>6. A Água que Incha</h3>
-        <p>A maioria das substâncias encolhe ao congelar, mas a água se expande devido às pontes de hidrogênio, fazendo o gelo flutuar.</p>
-    </article>
-    <article data-id="7">
-        <img src="assets/imagens/blog/chamaazul.jpg" alt="Chama Azul de Fogão" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>7. Fogo Azul do Gás</h3>
-        <p>A chama azul do fogão indica que há oxigênio suficiente para queimar o gás por completo, gerando mais calor e menos fuligem.</p>
-    </article>
-    <article data-id="8">
-        <img src="assets/imagens/blog/helio.jpg" alt="Sol ou Balão de Hélio" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>8. O Elemento do Sol</h3>
-        <p>O hélio foi descoberto primeiro no Sol através da análise da luz solar (espectroscopia) antes de ser encontrado na Terra.</p>
-    </article>
-    <article data-id="9">
-        <img src="assets/imagens/blog/sabao.jpg" alt="Espuma de Sabão" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>9. Como o Sabão Limpa?</h3>
-        <p>O sabão tem uma ponta que adora água e outra que adora gordura, unindo os dois para desgrudar a sujeira das roupas e louças.</p>
-    </article>
-    <article data-id="10">
-        <img src="assets/imagens/blog/ar.jpg" alt="Atmosfera" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>10. O Peso do Ar</h3>
-        <p>O ar ao nosso redor tem peso e exerce pressão constante sobre todos os corpos, equivalente a cerca de 1 kg por centímetro quadrado.</p>
-    </article>
-    <article data-id="11">
-        <img src="assets/imagens/blog/fogos.jpg" alt="Fogos de Artifício" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>11. O Brilho dos Fogos de Artifício</h3>
-        <p>As cores vivas dos fogos de artifício vêm da queima de sais de diferentes metais: cobre dá verde, estrôncio dá vermelho e sódio dá amarelo.</p>
-    </article>
-    <article data-id="12">
-        <img src="assets/imagens/blog/maca.jpg" alt="Maçã Cortada" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>12. A Maçã que Escurece</h3>
-        <p>Quando a maçã é cortada, enzimas entram em contato com o oxigênio do ar, provocando uma reação de oxidação que escurece a fruta.</p>
-    </article>
-    <article data-id="13">
-        <img src="assets/imagens/blog/refrigerante.jpg" alt="Refrigerante com Gás" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>13. O Gás do Refrigerante</h3>
-        <p>O gás carbônico é dissolvido na bebida sob alta pressão. Quando você abre a garrafa, a pressão cai e o gás escapa formando bolhas.</p>
-    </article>
-    <article data-id="14">
-        <img src="assets/imagens/blog/ferro.jpg" alt="Ferro Enferrujado" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>14. Por que o Ferro Enferruja?</h3>
-        <p>A ferrugem ocorre quando o ferro entra em contato com o oxigênio do ar e a umidade, formando óxidos metálicos através de uma reação de oxidação lenta.</p>
-    </article>
-    <article data-id="15">
-        <img src="assets/imagens/blog/lampada.jpg" alt="Lâmpada Acesa" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>15. O Brilho das Lâmpadas</h3>
-        <p>O filamento de tungstênio dentro das lâmpadas incandescentes suporta temperaturas altíssimas sem derreter, emitindo luz intensa e calor.</p>
-    </article>
-    <article data-id="16">
-        <img src="assets/imagens/blog/leite.jpg" alt="Leite Azedando" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>16. Por que o Leite Azeda?</h3>
-        <p>O leite azeda devido à ação de bactérias que consomem a lactose (o açúcar do leite) e a transformam em ácido lático, coalhando o líquido.</p>
-    </article>
-    <article data-id="17">
-        <img src="assets/imagens/blog/pilha.jpg" alt="Bateria ou Pilha" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>17. A Energia das Pilhas</h3>
-        <p>As pilhas funcionam por meio de reações químicas de oxi-redução, onde os elétrons se movimentam de um material para outro gerando corrente elétrica.</p>
-    </article>
-    <article data-id="18">
-        <img src="assets/imagens/blog/gelo.jpg" alt="Água com Gelo" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>18. O Calor do Gelo</h3>
-        <p>O processo de mudança de fase do gelo absorve calor do ambiente ao redor para conseguir derreter, causando uma forte sensação de resfriamento na pele.</p>
-    </article>
-    <article data-id="19">
-        <img src="assets/imagens/blog/pao.jpg" alt="Pão Assando" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>19. O Crescimento do Pão</h3>
-        <p>O fermento biológico consome os açúcares da massa e libera gás carbônico; preso na estrutura da massa, o gás faz o pão crescer e ficar fofinho.</p>
-    </article>
-    <article data-id="20">
-        <img src="assets/imagens/blog/geloseco.jpg" alt="Gelo Seco" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px;">
-        <h3>20. O Gelo que Não Molha</h3>
-        <p>O gelo seco é gás carbônico congelado no estado sólido. Ele passa direto do estado sólido para o gasoso sem virar líquido, processo chamado sublimação.</p>
-    </article>
-</section>
+            <nav>
+                <a href="index.html">Início</a>
+                <a href="paginas/experimentos.html">Experimentos</a>
+                <a href="paginas/videos.html">Vídeos</a>
+                <a href="paginas/perguntas.html">Perguntas</a>
+                <a href="paginas/professor.html">Professor</a>
+                <a href="sugestoes.html">Sugestões</a>
+            </nav>
+        </header>
 
-<footer>
-    <p>© 2026 - <a href="https://github.com/gustavohenrimerry" target="_blank" rel="noopener noreferrer">Desenvolvido por Gustavo </a></p>
-</footer>
+        <section class="banner-home">
+            <model-viewer
+                class="molecula-lateral"
+                src="quiz/molecule.glb"
+                auto-rotate
+                rotation-per-second="30deg"
+                auto-rotate-delay="1000"
+                camera-controls
+                interaction-policy="allow-when-focused"
+                camera-orbit="0deg 75deg 105%"
+                environment-image="neutral"
+                exposure="1.2"
+                shadow-intensity="1"
+                style="
+                    min-width: 400px;
+                    min-height: 400px;
+                    z-index: 10;
+                    display: block;
+                    background: transparent;
+                    border: none;
+                    flex-shrink: 0;
+                "
+            ></model-viewer>
 
-<script src="js/script.js"></script>
+            <div>
+                <h1>Aprenda Química de um jeito simples e divertido</h1>
+                <p>
+                    Conteúdos, experimentos, videos e quizzes para ajudar estudantes do 6º ano até o
+                    Ensino Médio.
+                </p>
+                <a class="botao" href="#series">Escolher minha série</a>
+            </div>
 
-</body>
+            <div class="emojis-laterais">
+                <span>⚗️</span>
+                <span>🧬</span>
+            </div>
+        </section>
+
+        <section class="sobre">
+            <h2>Bem-vindo ao laboratório virtual do Professor Wendel</h2>
+            <p>
+                Aqui você encontra aulas de Química, explicações, curiosidades, experimentos seguros
+                e desafios para testar seus conhecimentos.
+            </p>
+        </section>
+
+        <section class="cards">
+            <h2 style="color: white">Conteúdos do site</h2>
+            <div class="container">
+                <div class="card">
+                    <img
+                        src="assets/imagens/experimentos/experimento1.jpg"
+                        alt="Experimento de Química"
+                        style="
+                            width: 100%;
+                            height: 150px;
+                            object-fit: cover;
+                            border-radius: 6px;
+                            margin-bottom: 10px;
+                        "
+                    />
+                    <h3 style="color: #80ef80">🧪 Experimentos</h3>
+                    <p>Veja experiências de Química explicadas passo a passo.</p>
+                    <a href="paginas/experimentos.html">Ver experimentos</a>
+                </div>
+                <div class="card">
+                    <img
+                        src="assets/imagens/experimentos/videos.jpg"
+                        alt="Vídeos de Aulas de Química"
+                        style="
+                            width: 100%;
+                            height: 150px;
+                            object-fit: cover;
+                            border-radius: 6px;
+                            margin-bottom: 10px;
+                        "
+                    />
+                    <h3 style="color: #80ef80">🎥 Vídeos</h3>
+                    <p>Aulas e experiências usando vídeos do YouTube.</p>
+                    <a href="paginas/videos.html">Assistir vídeos</a>
+                </div>
+                <div class="card">
+                    <img
+                        src="assets/imagens/experimentos/perguntas.jpg"
+                        alt="Perguntas e Quizzes de Química"
+                        style="
+                            width: 100%;
+                            height: 150px;
+                            object-fit: cover;
+                            border-radius: 6px;
+                            margin-bottom: 10px;
+                        "
+                    />
+                    <h3 style="color: #80ef80">❓ Perguntas</h3>
+                    <p>Teste seus conhecimentos com perguntas de Química.</p>
+                    <a href="paginas/perguntas.html">Ver perguntas</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="series" class="series">
+            <h2>Escolha sua série</h2>
+            <div class="container">
+                <a href="paginas/6ano.html">6º Ano</a>
+                <a href="paginas/7ano.html">7º Ano</a>
+                <a href="paginas/8ano.html">8º Ano</a>
+                <a href="paginas/9ano.html">9º Ano</a>
+                <a href="paginas/1serie.html">1ª Série</a>
+                <a href="paginas/2serie.html">2ª Série</a>
+                <a href="paginas/3serie.html">3ª Série</a>
+            </div>
+        </section>
+
+        <section class="blog" id="secao-blog">
+            <h2 style="color: white">Curiosidades de Química</h2>
+
+            <article data-id="1">
+                <img
+                    src="assets/imagens/blog/vulcao.jpg"
+                    alt="Vulcão de bicarbonato"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>Por que o vulcão de bicarbonato acontece?</h3>
+                <p>
+                    Uma reação química entre bicarbonato de sódio e vinagre produz gás carbônico,
+                    causando a famosa espuma.
+                </p>
+            </article>
+            <article data-id="2">
+                <img
+                    src="assets/imagens/blog/banana.jpg"
+                    alt="Bananas"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>2. O Ouro do Bananal</h3>
+                <p>
+                    As bananas contêm bastante potássio, incluindo o potássio-40, que é radioativo
+                    de forma natural e inofensiva.
+                </p>
+            </article>
+            <article data-id="3">
+                <img
+                    src="assets/imagens/blog/mercurio.jpg"
+                    alt="Mercúrio Líquido"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>3. O Metal Líquido</h3>
+                <p>
+                    O mercúrio é o único metal da tabela periódica que se mantém no estado líquido à
+                    temperatura ambiente.
+                </p>
+            </article>
+            <article data-id="4">
+                <img
+                    src="assets/imagens/blog/cebola.jpg"
+                    alt="Cebola"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>4. Por que a Cebola Chora?</h3>
+                <p>
+                    Ao cortar a cebola, rompem-se células que liberam ácidos e enzimas, formando um
+                    gás volátil que irrita os olhos.
+                </p>
+            </article>
+            <article data-id="5">
+                <img
+                    src="assets/imagens/blog/carbono.jpg"
+                    alt="Diamante e Grafite"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>5. Diamante e Grafite</h3>
+                <p>
+                    Tanto o diamante precioso quanto o grafite do lápis são formados puramente por
+                    átomos de carbono, mudando apenas a estrutura.
+                </p>
+            </article>
+            <article data-id="6">
+                <img
+                    src="assets/imagens/blog/geloagua.jpg"
+                    alt="Gelo flutuando na água"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>6. A Água que Incha</h3>
+                <p>
+                    A maioria das substâncias encolhe ao congelar, mas a água se expande devido às
+                    pontes de hidrogênio, fazendo o gelo flutuar.
+                </p>
+            </article>
+            <article data-id="7">
+                <img
+                    src="assets/imagens/blog/chamaazul.jpg"
+                    alt="Chama Azul de Fogão"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>7. Fogo Azul do Gás</h3>
+                <p>
+                    A chama azul do fogão indica que há oxigênio suficiente para queimar o gás por
+                    completo, gerando mais calor e menos fuligem.
+                </p>
+            </article>
+            <article data-id="8">
+                <img
+                    src="assets/imagens/blog/helio.jpg"
+                    alt="Sol ou Balão de Hélio"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>8. O Elemento do Sol</h3>
+                <p>
+                    O hélio foi descoberto primeiro no Sol através da análise da luz solar
+                    (espectroscopia) antes de ser encontrado na Terra.
+                </p>
+            </article>
+            <article data-id="9">
+                <img
+                    src="assets/imagens/blog/sabao.jpg"
+                    alt="Espuma de Sabão"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>9. Como o Sabão Limpa?</h3>
+                <p>
+                    O sabão tem uma ponta que adora água e outra que adora gordura, unindo os dois
+                    para desgrudar a sujeira das roupas e louças.
+                </p>
+            </article>
+            <article data-id="10">
+                <img
+                    src="assets/imagens/blog/ar.jpg"
+                    alt="Atmosfera"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>10. O Peso do Ar</h3>
+                <p>
+                    O ar ao nosso redor tem peso e exerce pressão constante sobre todos os corpos,
+                    equivalente a cerca de 1 kg por centímetro quadrado.
+                </p>
+            </article>
+            <article data-id="11">
+                <img
+                    src="assets/imagens/blog/fogos.jpg"
+                    alt="Fogos de Artifício"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>11. O Brilho dos Fogos de Artifício</h3>
+                <p>
+                    As cores vivas dos fogos de artifício vêm da queima de sais de diferentes
+                    metais: cobre dá verde, estrôncio dá vermelho e sódio dá amarelo.
+                </p>
+            </article>
+            <article data-id="12">
+                <img
+                    src="assets/imagens/blog/maca.jpg"
+                    alt="Maçã Cortada"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>12. A Maçã que Escurece</h3>
+                <p>
+                    Quando a maçã é cortada, enzimas entram em contato com o oxigênio do ar,
+                    provocando uma reação de oxidação que escurece a fruta.
+                </p>
+            </article>
+            <article data-id="13">
+                <img
+                    src="assets/imagens/blog/refrigerante.jpg"
+                    alt="Refrigerante com Gás"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>13. O Gás do Refrigerante</h3>
+                <p>
+                    O gás carbônico é dissolvido na bebida sob alta pressão. Quando você abre a
+                    garrafa, a pressão cai e o gás escapa formando bolhas.
+                </p>
+            </article>
+            <article data-id="14">
+                <img
+                    src="assets/imagens/blog/ferro.jpg"
+                    alt="Ferro Enferrujado"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>14. Por que o Ferro Enferruja?</h3>
+                <p>
+                    A ferrugem ocorre quando o ferro entra em contato com o oxigênio do ar e a
+                    umidade, formando óxidos metálicos através de uma reação de oxidação lenta.
+                </p>
+            </article>
+            <article data-id="15">
+                <img
+                    src="assets/imagens/blog/lampada.jpg"
+                    alt="Lâmpada Acesa"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>15. O Brilho das Lâmpadas</h3>
+                <p>
+                    O filamento de tungstênio dentro das lâmpadas incandescentes suporta
+                    temperaturas altíssimas sem derreter, emitindo luz intensa e calor.
+                </p>
+            </article>
+            <article data-id="16">
+                <img
+                    src="assets/imagens/blog/leite.jpg"
+                    alt="Leite Azedando"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>16. Por que o Leite Azeda?</h3>
+                <p>
+                    O leite azeda devido à ação de bactérias que consomem a lactose (o açúcar do
+                    leite) e a transformam em ácido lático, coalhando o líquido.
+                </p>
+            </article>
+            <article data-id="17">
+                <img
+                    src="assets/imagens/blog/pilha.jpg"
+                    alt="Bateria ou Pilha"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>17. A Energia das Pilhas</h3>
+                <p>
+                    As pilhas funcionam por meio de reações químicas de oxi-redução, onde os
+                    elétrons se movimentam de um material para outro gerando corrente elétrica.
+                </p>
+            </article>
+            <article data-id="18">
+                <img
+                    src="assets/imagens/blog/gelo.jpg"
+                    alt="Água com Gelo"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>18. O Calor do Gelo</h3>
+                <p>
+                    O processo de mudança de fase do gelo absorve calor do ambiente ao redor para
+                    conseguir derreter, causando uma forte sensação de resfriamento na pele.
+                </p>
+            </article>
+            <article data-id="19">
+                <img
+                    src="assets/imagens/blog/pao.jpg"
+                    alt="Pão Assando"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>19. O Crescimento do Pão</h3>
+                <p>
+                    O fermento biológico consome os açúcares da massa e libera gás carbônico; preso
+                    na estrutura da massa, o gás faz o pão crescer e ficar fofinho.
+                </p>
+            </article>
+            <article data-id="20">
+                <img
+                    src="assets/imagens/blog/geloseco.jpg"
+                    alt="Gelo Seco"
+                    style="
+                        width: 100%;
+                        max-height: 200px;
+                        object-fit: cover;
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    "
+                />
+                <h3>20. O Gelo que Não Molha</h3>
+                <p>
+                    O gelo seco é gás carbônico congelado no estado sólido. Ele passa direto do
+                    estado sólido para o gasoso sem virar líquido, processo chamado sublimação.
+                </p>
+            </article>
+        </section>
+
+        <footer>
+            <p>
+                © 2026 -
+                <a
+                    href="https://github.com/gustavohenrimerry"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Desenvolvido por Gustavo
+                </a>
+            </p>
+        </footer>
+
+        <script src="js/script.js"></script>
+    </body>
 </html>

@@ -25,8 +25,8 @@ async function carregarPerguntas() {
         perguntasData = {};
     }
 
-    let perguntasAdmin = JSON.parse(localStorage.getItem('admin_quizzes')) || [];
-    perguntasAdmin.forEach(q => {
+    let perguntasAdmin = JSON.parse(localStorage.getItem("admin_quizzes")) || [];
+    perguntasAdmin.forEach((q) => {
         if (!perguntasData[q.serie]) {
             perguntasData[q.serie] = [];
         }
@@ -37,14 +37,14 @@ async function carregarPerguntas() {
             pergunta: q.pergunta,
             alternativas: q.alternativas,
             resposta: indiceCorreto,
-            explicacao: q.explicacao || "Sem explicação cadastrada."
+            explicacao: q.explicacao || "Sem explicação cadastrada.",
         });
     });
 }
 
 carregarPerguntas();
 
-document.querySelectorAll(".btn-serie").forEach(botao => {
+document.querySelectorAll(".btn-serie").forEach((botao) => {
     botao.addEventListener("click", (e) => {
         const serie = e.target.getAttribute("data-serie");
 
@@ -68,7 +68,8 @@ function mostrarPergunta() {
     resetarEstado();
     const currentPergunta = serieAtual[perguntaAtualIndex];
 
-    if (contadorPergunta) contadorPergunta.innerText = `Pergunta ${perguntaAtualIndex + 1} de ${serieAtual.length}`;
+    if (contadorPergunta)
+        contadorPergunta.innerText = `Pergunta ${perguntaAtualIndex + 1} de ${serieAtual.length}`;
     if (perguntaTexto) perguntaTexto.innerText = currentPergunta.pergunta;
 
     currentPergunta.alternativas.forEach((alternativa, index) => {
@@ -90,12 +91,13 @@ function selecionarAlternativa(botaoSelecionado, indiceEscolhido, perguntaObj) {
     const botoes = alternativasContainer.querySelectorAll(".btn-alternativa");
     const indiceCorreto = perguntaObj.resposta;
 
-    botoes.forEach(btn => btn.disabled = true);
+    botoes.forEach((btn) => (btn.disabled = true));
 
     if (indiceEscolhido === indiceCorreto) {
         botaoSelecionado.classList.add("correta");
         pontuacao++;
-        if (explicacaoTexto) explicacaoTexto.innerHTML = `<strong>✨ Resposta Correta!</strong><br>${perguntaObj.explicacao}`;
+        if (explicacaoTexto)
+            explicacaoTexto.innerHTML = `<strong>✨ Resposta Correta!</strong><br>${perguntaObj.explicacao}`;
         if (explicacaoContainer) {
             explicacaoContainer.style.background = "#d4edda";
             explicacaoContainer.style.borderColor = "#28a745";
@@ -107,7 +109,8 @@ function selecionarAlternativa(botaoSelecionado, indiceEscolhido, perguntaObj) {
             botoes[indiceCorreto].classList.add("correta");
         }
 
-        if (explicacaoTexto) explicacaoTexto.innerHTML = `<strong>❌ Resposta Incorreta!</strong><br>A alternativa certa era: <em>"${perguntaObj.alternativas[indiceCorreto]}"</em><br><br><strong>💡 Explicação:</strong> ${perguntaObj.explicacao}`;
+        if (explicacaoTexto)
+            explicacaoTexto.innerHTML = `<strong>❌ Resposta Incorreta!</strong><br>A alternativa certa era: <em>"${perguntaObj.alternativas[indiceCorreto]}"</em><br><br><strong>💡 Explicação:</strong> ${perguntaObj.explicacao}`;
         if (explicacaoContainer) {
             explicacaoContainer.style.background = "#f8d7da";
             explicacaoContainer.style.borderColor = "#dc3545";
@@ -159,7 +162,9 @@ async function toggleModoProfessorGlobal() {
 
     if (!window.meuClienteSupabase) return;
 
-    const { data: { session } } = await window.meuClienteSupabase.auth.getSession();
+    const {
+        data: { session },
+    } = await window.meuClienteSupabase.auth.getSession();
 
     if (!session) {
         alert("🔐 Você precisa fazer login como professor.");
@@ -193,14 +198,18 @@ async function toggleModoProfessorGlobal() {
 }
 
 async function carregarDadosPainelProfessor() {
-    const perguntasAdmin = JSON.parse(localStorage.getItem('admin_quizzes')) || [];
-    console.log(`Painel do professor ativo. ${perguntasAdmin.length} pergunta(s) customizada(s) carregada(s).`);
+    const perguntasAdmin = JSON.parse(localStorage.getItem("admin_quizzes")) || [];
+    console.log(
+        `Painel do professor ativo. ${perguntasAdmin.length} pergunta(s) customizada(s) carregada(s).`,
+    );
 }
 
 async function verificarLogin() {
     if (!window.meuClienteSupabase) return;
 
-    const { data: { session } } = await window.meuClienteSupabase.auth.getSession();
+    const {
+        data: { session },
+    } = await window.meuClienteSupabase.auth.getSession();
 
     const status = document.getElementById("status-login");
     const login = document.getElementById("link-login");

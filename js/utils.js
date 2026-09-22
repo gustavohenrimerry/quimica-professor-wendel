@@ -17,7 +17,10 @@
 async function verificarSeProfessor() {
     try {
         if (!window.meuClienteSupabase) return false;
-        const { data: { session }, error } = await window.meuClienteSupabase.auth.getSession();
+        const {
+            data: { session },
+            error,
+        } = await window.meuClienteSupabase.auth.getSession();
         if (error) {
             console.warn("Erro ao obter sessão:", error.message);
             return false;
@@ -47,7 +50,7 @@ async function loginViaPainel() {
 
     const { data, error } = await window.meuClienteSupabase.auth.signInWithPassword({
         email: email.trim(),
-        password: senha
+        password: senha,
     });
 
     if (error) {
@@ -86,7 +89,7 @@ async function entrarAdmin() {
 
     const { error } = await window.meuClienteSupabase.auth.signInWithPassword({
         email: email,
-        password: senha
+        password: senha,
     });
 
     if (error) {
@@ -136,12 +139,12 @@ async function inicializarBarraAdmin() {
         if (status) status.innerText = "🔓 Modo Professor Ativo";
         if (blocoLogin) blocoLogin.style.display = "none";
         if (botoesAdmin) botoesAdmin.style.display = "inline-block";
-        botoesAdminGerais.forEach(el => el.style.display = "block");
+        botoesAdminGerais.forEach((el) => (el.style.display = "block"));
     } else {
         if (status) status.innerText = "🔒 Modo Visitante";
         if (blocoLogin) blocoLogin.style.display = "inline-block";
         if (botoesAdmin) botoesAdmin.style.display = "none";
-        botoesAdminGerais.forEach(el => el.style.display = "none");
+        botoesAdminGerais.forEach((el) => (el.style.display = "none"));
     }
 }
 
@@ -154,7 +157,9 @@ function abrirModalCuriosidade() {
         modal.style.display = "block";
     } else {
         // Redireciona para o blog de curiosidades se estiver em subpáginas
-        const destino = window.location.pathname.includes("/paginas/") ? "../index.html#secao-blog" : "index.html#secao-blog";
+        const destino = window.location.pathname.includes("/paginas/")
+            ? "../index.html#secao-blog"
+            : "index.html#secao-blog";
         window.location.href = destino;
     }
 }
@@ -173,7 +178,9 @@ function fecharModalCuriosidade() {
  * Salva ou emite aviso sobre adição de curiosidade no modal.
  */
 function salvarCuriosidade() {
-    alert("Para publicar ou gerenciar curiosidades de forma persistente, utilize o painel de conteúdos.");
+    alert(
+        "Para publicar ou gerenciar curiosidades de forma persistente, utilize o painel de conteúdos.",
+    );
     fecharModalCuriosidade();
 }
 
@@ -218,9 +225,11 @@ function calcularTempoRelativo(timestamp) {
 
     if (diferencaSegundos < 60) return "agora mesmo";
     const diferencaMinutos = Math.floor(diferencaSegundos / 60);
-    if (diferencaMinutos < 60) return "há " + diferencaMinutos + (diferencaMinutos === 1 ? " minuto" : " minutos");
+    if (diferencaMinutos < 60)
+        return "há " + diferencaMinutos + (diferencaMinutos === 1 ? " minuto" : " minutos");
     const diferencaHoras = Math.floor(diferencaMinutos / 60);
-    if (diferencaHoras < 24) return "há " + diferencaHoras + (diferencaHoras === 1 ? " hora" : " horas");
+    if (diferencaHoras < 24)
+        return "há " + diferencaHoras + (diferencaHoras === 1 ? " hora" : " horas");
     const diferencaDias = Math.floor(diferencaHoras / 24);
     return "há " + diferencaDias + (diferencaDias === 1 ? " dia" : " dias");
 }

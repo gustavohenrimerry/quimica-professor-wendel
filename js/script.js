@@ -1,8 +1,8 @@
 /**
  * script.js - Lógica específica da Página Inicial (Home)
  * Química com Professor Wendel
- * 
- * As funções compartilhadas (autenticação, barra admin, utilitários) 
+ *
+ * As funções compartilhadas (autenticação, barra admin, utilitários)
  * estão centralizadas em js/utils.js.
  */
 
